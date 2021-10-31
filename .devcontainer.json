@@ -1,0 +1,14 @@
+{
+    "image": "mksoska/gns3-images:focal-netbox",
+	"forwardPorts": [
+		8000
+	],
+
+	"postCreateCommand": "source /opt/netbox/venv/bin/activate && python /workspaces/netbox-plugin-netdisco/setup.py develop",
+	
+	"extensions": [
+		"ms-python.vscode-pylance",
+		"ms-python.python"
+	]
+  }
+  
