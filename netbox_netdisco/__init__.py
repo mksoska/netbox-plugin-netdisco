@@ -9,7 +9,7 @@ class NetboxNetdiscoConfig(PluginConfig):
     author = 'Marek Soska'
     author_email = 'mareksoska22@gmail.com'
     base_url = 'netbox-plugin-netdisco'
-    required_settings = []
-    default_settings = {}
+    required_settings = ["NETDISCO_HOST", "NETDISCO_USERNAME", "NETDISCO_PASSWORD"]
+    default_settings = {"NETDISCO_HOST": "http://localhost:8000"}
 
 config = NetboxNetdiscoConfig
