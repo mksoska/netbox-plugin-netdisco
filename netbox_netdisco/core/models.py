@@ -1,72 +1,118 @@
-from openapi_netdisco.models import port
-from .utilities import cast, list_cast
+from .utilities import is_consistent
 from .netdisco import Netdisco
-from openapi_netdisco import models
-import dcim.models
 
-class Device(models.Device):   
-    def __new__(cls, model):
-        return cast(cls, super(), model)
+#import dcim.models
+import openapi_netdisco.models
 
-    def __init__(self, _):
-        #Handle with try catch
-        self.netbox = dcim.models.Device.objects.get(primary_ip4__address=self.ip)
-        self.ports = self.ports_get()   
+
+class CommonModel():
+    def __init__(self, netdisco, netbox, attribute_map):
+        self.netdisco = netdisco
+        self.netbox = netbox
+        self.attribute_map = attribute_map
+    
+    @property
+    def is_consistent(self):   
+        if self.netbox:           
+            return is_consistent(self.attribute_map, self.netdisco, self.netbox)
+
+    def to_dict(self):
+        return self.netdisco.to_dict()
+
+
+
+class Device(CommonModel):
+    objects = {}
+
+    def __init__(self, device, **kwargs):
+        netbox = None #dcim.models.Device.objects.filter({self.attribute_map[self.ip]: self.ip}).first()
+        attribute_map = {
+            "ip": "primary_ip4__address",
+            "name": "name"
+        }
+        super().__init__(device, netbox, attribute_map)
         
-    @classmethod
-    def get(cls, ip, **kwargs):
-        return cls(Netdisco.objects.api_v1_object_device_ip_get(ip, **kwargs))
+        self.ports = [Port(self, port) for port in Port._get_ports(device.ip, **kwargs) if Port._is_apimodel(port)]
+        self.addresses = [Address(self, address) for address in Address._get_addresses(device.ip, **kwargs) if Address._is_apimodel(address)]
+        self.vlans = [Vlan(self, vlan) for vlan in Vlan._get_vlans(device.ip, **kwargs) if Vlan._is_apimodel(vlan)]
 
-    @classmethod
-    def search(cls, **kwargs):
-        return list_cast(cls, Netdisco.search.api_v1_search_device_get(**kwargs))
+        Device.objects[device.ip] = self
 
-    def ports_get(self, **kwargs):
-        return list_cast(Port, Netdisco.objects.api_v1_object_device_ip_ports_get(self.ip, **kwargs))
+    @staticmethod
+    def _get(ip, **kwargs):
+        return Netdisco.objects.api_v1_object_device_ip_get(ip, **kwargs)
 
-    #TODO
-    def ports_search(self, partial=True, **kwargs):
-        return [port for port in self.ports if port.attribute_map]
+    @staticmethod
+    def _is_apimodel(instance):
+        return isinstance(instance, openapi_netdisco.models.Device)
+
+
     
-    #TODO
-    @property
-    def is_consistent(self):
-        pass
+class Port(CommonModel):
+    objects = {}
 
+    def __init__(self, device, port):
+        netbox = None #dcim.models.Interface.objects.filter(name=self.name, device__ip=device.).first()
+        attribute_map = {
+            "ip": ["", ""],
+            "name": "name"
+        }
+        super().__init__(port, netbox, attribute_map)
 
+        self.device = device
+        Port.objects[f"{device.ip}_{port.name}"] = self
 
-class Port(models.Port):
-    def __new__(cls, model):
-        return cast(cls, super(), model)
-
-    def __init__(self, _):
-        #Handle with try catch
-        self.netbox = dcim.models.Interface.objects.get(name=self.name)
-
-    @classmethod
-    def get(cls, ip, port, **kwargs):
-        return cls(Netdisco.objects.api_v1_object_device_ip_port_port_get(ip, port, **kwargs))  
+    @staticmethod
+    def _get_ports(ip, **kwargs):
+        return Netdisco.objects.api_v1_object_device_ip_ports_get(ip, **kwargs)
     
-    @classmethod
-    def search(cls, **kwargs):
-        return list_cast(cls, Netdisco.search.api_v1_search_port_get(**kwargs))
+    @staticmethod
+    def _is_apimodel(instance):
+        return isinstance(instance, openapi_netdisco.models.Port)
+        
+
+
+class Address(CommonModel):
+    objects = {}
+
+    def __init__(self, device, address):
+        netbox = None #ipam.models.IPAddress.objects.filter()
+        attribute_map = {
+
+        }
+        super().__init__(address, netbox, attribute_map)
+
+        self.device = device
+        Address.objects[address] = self
+
+    @staticmethod
+    def _get_addresses(ip, **kwargs):
+        return Netdisco.objects.api_v1_object_device_ip_device_ips_get(ip, **kwargs)
     
-    #TODO
-    @property
-    def is_consistent(self):
-        pass
+    @staticmethod
+    def _is_apimodel(instance):
+        return isinstance(instance, openapi_netdisco.models.Address)
 
 
-class PortUtilization(models.PortUtilization):
-    def __new__(cls, model):
-        return cast(cls, super(), model)
-    
-    def __init__(self, _):
-        self.device = Device.get(self.ip)
 
-    @classmethod
-    def get(cls, **kwargs):
-        return list_cast(cls, Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs))
-        #return cast(cls, Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs))  
+class Vlan(CommonModel):
+    objects = {}
 
+    def __init__(self, device, vlan):
+        netbox = None #ipam.models.VLAN.objects.filter()
+        attribute_map = {
+            
+        }
+        super().__init__(vlan, netbox, attribute_map)
+
+        self.device = device
+        Vlan.objects[f"{device.ip}_{vlan.vlan}"] = self
+
+    @staticmethod
+    def _get_vlans(ip, **kwargs):
+        return Netdisco.objects.api_v1_object_device_ip_vlans_get(ip, **kwargs)
+
+    @staticmethod
+    def _is_apimodel(instance):
+        return isinstance(instance, openapi_netdisco.models.Vlan)
     

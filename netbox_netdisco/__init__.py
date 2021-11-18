@@ -2,7 +2,7 @@ from extras.plugins import PluginConfig
 
 class NetboxNetdiscoConfig(PluginConfig):
     name = 'netbox_netdisco'
-    verbose_name = 'NetBox plugin for Netdisco integration'
+    verbose_name = 'Netdisco'
     description = ('A plugin for comparing and synchronizing Netdisco device'
     'inventory with NetBox')
     version = '0.1'
