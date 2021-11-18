@@ -1,6 +1,4 @@
-from openapi_netdisco import ReportsApi
-from openapi_netdisco import SearchApi
-from openapi_netdisco import ObjectsApi
+from openapi_netdisco import ReportsApi, SearchApi, ObjectsApi
 from .client import Client
 
 
@@ -17,4 +15,4 @@ class Netdisco():
     def close(cls):
         cls.client.__exit__()
 
-Netdisco.start_session()
+
