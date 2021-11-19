@@ -1,13 +1,13 @@
 
-def is_consistent(attribute_map, netdisco_model, netbox_model):
+def is_consistent(model):
     # Maybe lowercase if attribute is a string
-    for key in attribute_map:
-        netdisco = netdisco_model
+    for key in model.attribute_map:
+        netdisco = model.netdisco
         for attr in key.split('__'):
             netdisco = getattr(netdisco, attr)
         
-        netbox = netbox_model
-        for attr in attribute_map[key].split('__'):
+        netbox = model.netbox
+        for attr in model.attribute_map[key].split('__'):
             netbox = getattr(netbox, attr)
 
         if netdisco != netbox:

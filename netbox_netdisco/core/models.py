@@ -12,9 +12,9 @@ class CommonModel():
         self.attribute_map = attribute_map
     
     @property
-    def is_consistent(self):   
+    def is_consistent(self):
         if self.netbox:           
-            return is_consistent(self.attribute_map, self.netdisco, self.netbox)
+            return is_consistent(self)
 
     def to_dict(self):
         return self.netdisco.to_dict()
@@ -25,12 +25,14 @@ class Device(CommonModel):
     objects = {}
 
     def __init__(self, device, **kwargs):
-        netbox = None #dcim.models.Device.objects.filter({self.attribute_map[self.ip]: self.ip}).first()
         attribute_map = {
             "ip": "primary_ip4__address",
+
             "name": "name"
         }
-        super().__init__(device, netbox, attribute_map)
+
+        #dcim.models.Device.objects.filter(**{self.attribute_map["ip"]: ip}).first()
+        super().__init__(device, None, attribute_map)
         
         self.ports = [Port(self, port) for port in Port._get_ports(device.ip, **kwargs) if Port._is_apimodel(port)]
         self.addresses = [Address(self, address) for address in Address._get_addresses(device.ip, **kwargs) if Address._is_apimodel(address)]
@@ -52,15 +54,16 @@ class Port(CommonModel):
     objects = {}
 
     def __init__(self, device, port):
-        netbox = None #dcim.models.Interface.objects.filter(name=self.name, device__ip=device.).first()
         attribute_map = {
-            "ip": ["", ""],
-            "name": "name"
+            "ip": "device__primary_ip4__address",
+            "port": "name" # or maybe "name": "name"
         }
-        super().__init__(port, netbox, attribute_map)
+
+        #dcim.models.Interface.objects.filter(**{attribute_map["ip"]: ip, attribute_map["name"]: name}).first()
+        super().__init__(port, None, attribute_map)
 
         self.device = device
-        Port.objects[f"{device.ip}_{port.name}"] = self
+        Port.objects[f"{port.ip}_{port.port}"] = self
 
     @staticmethod
     def _get_ports(ip, **kwargs):
@@ -76,14 +79,15 @@ class Address(CommonModel):
     objects = {}
 
     def __init__(self, device, address):
-        netbox = None #ipam.models.IPAddress.objects.filter()
         attribute_map = {
-
+            "alias": "address"
         }
-        super().__init__(address, netbox, attribute_map)
+
+        #ipam.models.IPAddress.objects.filter(**{attribute_map["alias"]: alias}).first()
+        super().__init__(address, None, attribute_map)
 
         self.device = device
-        Address.objects[address] = self
+        Address.objects[address.alias] = self
 
     @staticmethod
     def _get_addresses(ip, **kwargs):
@@ -99,14 +103,15 @@ class Vlan(CommonModel):
     objects = {}
 
     def __init__(self, device, vlan):
-        netbox = None #ipam.models.VLAN.objects.filter()
         attribute_map = {
-            
+            "vlan": "vid"
         }
-        super().__init__(vlan, netbox, attribute_map)
+
+        #ipam.models.VLAN.objects.filter(**{attribute_map["vlan"]: vlan})
+        super().__init__(vlan, None, attribute_map)
 
         self.device = device
-        Vlan.objects[f"{device.ip}_{vlan.vlan}"] = self
+        Vlan.objects[f"{vlan.ip}_{vlan.vlan}"] = self
 
     @staticmethod
     def _get_vlans(ip, **kwargs):

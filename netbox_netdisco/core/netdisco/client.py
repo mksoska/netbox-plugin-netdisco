@@ -20,12 +20,12 @@ class Client():
 
         self.login()        
 
-        return self.api_client
+        return self
 
-    def __exit__(self):
+    def __exit__(self, exc_type, exc_value, traceback):
         self.logout()
 
-        self.api_client.__exit__()
+        self.api_client.__exit__(exc_type, exc_value, traceback)
 
 
     def login(self):

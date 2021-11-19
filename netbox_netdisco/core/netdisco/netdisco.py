@@ -2,17 +2,16 @@ from openapi_netdisco import ReportsApi, SearchApi, ObjectsApi
 from .client import Client
 
 
-class Netdisco():
-    #Maybe do as context manager
-    @classmethod
-    def start_session(cls):
-        cls.client = Client().__enter__()
-        cls.objects = ObjectsApi(cls.client)
-        cls.search = SearchApi(cls.client)
-        cls.reports = ReportsApi(cls.client)  
+class Netdisco():    
+    def __enter__(self):
+        self.client = Client().__enter__()
+        Netdisco.objects = ObjectsApi(self.client.api_client)
+        Netdisco.search = SearchApi(self.client.api_client)
+        Netdisco.reports = ReportsApi(self.client.api_client) 
+        return self
 
-    @classmethod
-    def close(cls):
-        cls.client.__exit__()
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.client.__exit__(exc_type, exc_value, traceback)
+        
 
 

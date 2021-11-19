@@ -11,9 +11,9 @@ class Inventory():
         Address.objects.clear()
         Vlan.objects.clear()
 
-        Netdisco.start_session()
-        Inventory._initialize_devices(**kwargs)
-        Netdisco.close()
+        with Netdisco() as _:
+            Inventory._initialize_devices(**kwargs)
+            
 
     #TODO: Make prettier (at least naming)
     @staticmethod
