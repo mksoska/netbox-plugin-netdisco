@@ -5,6 +5,19 @@ from .netdisco import Netdisco
 import openapi_netdisco.models
 
 
+def initialize(**kwargs):
+    for portutilization in Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs):
+        device = Device._get(portutilization.ip, **kwargs)
+        if Device._is_apimodel(device):
+            Device(device, **kwargs)
+   
+def clear_all():
+    Device.objects.clear()
+    Port.objects.clear()
+    Address.objects.clear()
+    Vlan.objects.clear()
+
+
 class CommonModel():
     def __init__(self, netdisco, netbox, attribute_map, attribute_tag):
         self.netdisco = netdisco
@@ -77,7 +90,7 @@ class Device(CommonModel):
     @staticmethod
     def _is_apimodel(instance):
         return isinstance(instance, openapi_netdisco.models.Device)
-
+         
 
     
 class Port(CommonModel):
