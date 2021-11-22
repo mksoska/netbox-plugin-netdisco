@@ -1,0 +1,1 @@
+from .icinga2 import Icinga
