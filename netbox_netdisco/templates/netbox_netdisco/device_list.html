@@ -1,11 +1,37 @@
-{% extends 'base/layout.html' %}
+{% extends 'netbox_netdisco/components/list.html' %}
 {% load render_table from django_tables2 %}
 
-{% block content %}
-<h1>{% block title %}Device Inventory{% endblock %}</h1>
-<div class="row">
-    <div class="col-md-9">
-        {% render_table table %}
+{% block title %}
+Devices
+{% endblock %}
+
+{% block subtitle %}
+<h5>Netdisco</h5>
+{% endblock %}
+
+{% block extra_nav_tabs %}
+<li class="nav-item" role="presentation">
+    <button class="nav-link" id="port-list-tab" data-bs-toggle="tab" data-bs-target="#port-list" type="button" role="tab" aria-controls="edit-form" aria-selected="true">
+        Inventory
+    </button>
+</li>
+{% endblock %}
+
+{% block extra_tabs %}
+<div class="tab-pane show" id="port-list" role="tabpanel" aria-labelledby="port-list-tab">
+    {% include 'netbox_netdisco/quick_find.html' %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                {% render_table port_table %}
+            </div>                
+        </div>           
     </div>
 </div>
 {% endblock %}
+
+
+{% block search %}
+Say Hi!
+{%endblock  %}
+

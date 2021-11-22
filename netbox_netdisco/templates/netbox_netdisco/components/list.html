@@ -1,0 +1,39 @@
+{% extends 'base/layout.html' %}
+{% load render_table from django_tables2 %}
+
+{% block tabs %}
+<ul class="nav nav-tabs px-3">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="object-list-tab" data-bs-toggle="tab" data-bs-target="#object-list" type="button" role="tab" aria-controls="edit-form" aria-selected="true">
+            Records
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="filters-form-tab" data-bs-toggle="tab" data-bs-target="#filters-form" type="button" role="tab" aria-controls="object-list" aria-selected="false">
+            Filters
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane show active" id="object-list" role="tabpanel" aria-labelledby="object-list-tab">
+        {% include 'netbox_netdisco/components/quick_find.html' %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    {% render_table table %}
+                </div>                
+            </div>           
+        </div>
+    </div>
+    <div class="tab-pane show" id="filters-form" role="tabpanel" aria-labelledby="filters-form-tab">
+        <form action="." method="get">
+            <div class="card">
+                <div class="card-body overflow-visible d-flex flex-wrap justify-content-between py-3">
+                    {% block search %}{% endblock %}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

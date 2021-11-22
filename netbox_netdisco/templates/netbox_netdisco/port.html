@@ -1,5 +1,28 @@
 {% extends 'base/layout.html' %}
 
+{% block title %}
+<div class="row">
+    <h6>
+        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:port_list' %}">Ports</a> >
+        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:port' ip=port.netdisco.ip port=port.netdisco.port %}">{{ port.netdisco.name }}</a>
+    </h6>
+</div>
+{{ port.netdisco.port }}
+{% endblock %}
 
-{% block content %}
+{% block subtitle %}
+<h5>Netdisco</h5>
+{% endblock %}
+
+{% block tabs %}
+<ul class="nav nav-tabs px-3">
+    <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="{% url 'plugins:netbox_netdisco:port' ip=port.netdisco.ip port=port.netdisco.port %}">
+            Port
+        </a>
+    </li>    
+</ul>
+{% with model=port model_name="Port" %}
+{% include 'netbox_netdisco/components/model.html' %}
+{% endwith %}
 {% endblock %}

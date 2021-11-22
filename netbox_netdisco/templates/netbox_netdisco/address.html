@@ -1,0 +1,28 @@
+{% extends 'base/layout.html' %}
+
+{% block title %}
+<div class="row">
+    <h6>
+        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:address_list' %}">IP Addresses</a> >
+        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:address' ip=address.netdisco.alias %}">{{ address.netdisco.alias }}</a>
+    </h6>
+</div>
+{{ address.netdisco.alias }}
+{% endblock %}
+
+{% block subtitle %}
+<h5>Netdisco</h5>
+{% endblock %}
+
+{% block tabs %}
+<ul class="nav nav-tabs px-3">
+    <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="{% url 'plugins:netbox_netdisco:address' ip=address.netdisco.alias %}">
+            Address
+        </a>
+    </li>    
+</ul>
+{% with model=address model_name="IP Address" %}
+{% include 'netbox_netdisco/components/model.html' %}
+{% endwith %}
+{% endblock %}

@@ -1,64 +1,43 @@
 {% extends 'base/layout.html' %}
 
-
-{% block content %}
+{% block title %}
 <div class="row">
-    <div class="col-md-6 col-md-offset-3">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <strong>Device details</strong>
-            </div>
-            <div class="row">
-                <button>Show in Netdisco</button>
-                <button>Show in Netbox</button>
-            </div>
-            <table class="table table-hover panel-body attr-table">
-                <tr>
-                    <td>System Name</td>
-                    <td>
-                        {{ device.netdisco.name }}
-                        {% if device.is_consistent %}                                                
-                            <span class="row">NetBox device name: {{ device.netbox.name }}</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Location</td>
-                    <td>
-                        {{ device.netdisco.name }}
-                        {% if device.is_consistent %}                                                
-                            <span class="row">NetBox device name: {{ device.netbox.name }}</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Local BGP AS</td>
-                    <td>{{ bgppeering.local_as }}</td>
-                </tr>
-                <tr>
-                    <td>Local peering IP address</td>
-                    <td>
-                        <a href="{% url 'ipam:ipaddress' pk=bgppeering.local_ip.pk %}">{{ bgppeering.local_ip }}</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Remote BGP AS</td>
-                    <td>{{ bgppeering.remote_as }}</td>
-                </tr>
-                <tr>
-                    <td>Remote peering IP address</td>
-                    <td>{{ bgppeering.remote_ip }}</td>
-                </tr>
-                <tr>
-                    <td>Peer name</td>
-                    <td>{{ bgppeering.peer_name|placeholder }}</td>
-                </tr>
-                <tr>
-                    <td>Description</td>
-                    <td>{{ bgppeering.description|placeholder }}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
+    <h6>
+        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:device_list' %}">Devices</a> > 
+        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:device' ip=device.netdisco.ip %}">{{ device.netdisco.name }}</a>
+    </h6>
 </div>
+{{ device.netdisco.dns }}
+{% endblock %}
+
+{% block subtitle %}
+<h5>Netdisco</h5>
+{% endblock %}
+
+{% block tabs %}
+<ul class="nav nav-tabs px-3">
+    <li role="presentation" class="nav-item">
+        <a class="nav-link active" href="{% url 'plugins:netbox_netdisco:device' ip=device.netdisco.ip %}">
+            Device
+        </a>
+    </li>
+    <li role="presentation" class="nav-item">
+        <a class="nav-link" href="{% url 'plugins:netbox_netdisco:device_port_list' ip=device.netdisco.ip %}">
+            Ports
+        </a>
+    </li>
+    <li role="presentation" class="nav-item">
+        <a class="nav-link" href="{% url 'plugins:netbox_netdisco:device_address_list' ip=device.netdisco.ip %}">            
+            IP addresses
+        </a>
+    </li>
+    <li role="presentation" class="nav-item">
+        <a class="nav-link" href="{% url 'plugins:netbox_netdisco:device_vlan_list' ip=device.netdisco.ip %}">
+            VLANs
+        </a>
+    </li>
+</ul>
+{% with model=device model_name="Device" %}
+{% include 'netbox_netdisco/components/model.html' %}
+{% endwith %}
 {% endblock %}

@@ -1,0 +1,36 @@
+{% load custom_tags %}
+
+<div class="tab-content">
+    <div class="row justify-content-left">
+        <div class="col col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        {{ model_name }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover attr-table">                                          
+                            <tbody>
+                                {% for key in model.attribute_tag %}
+                                <tr class="{% if model.is_consistent == False %}bg-danger{% endif %}">
+                                    <th scope="row">{% getattr_name model key %}</th>
+                                    <td>
+                                        {% getattr_netdisco model key %}                                       
+                                    </td>
+                                    {% if model.is_consistent == False %}                                    
+                                    <td class="text-danger">
+                                        NetBox: {% getattr_netbox model key %}
+                                    </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}                               
+                            </tbody>                            
+                        </table>     
+                    </div>
+                </div>           
+            </div>
+        </div>
+    </div>
+</div>
