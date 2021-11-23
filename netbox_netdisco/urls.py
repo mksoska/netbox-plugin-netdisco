@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.NetdiscoDeviceListView.as_view(), name='device_list'),
+    path('device/', views.NetdiscoDeviceListView.as_view(), name='device_list'),
     path('device/<ip>/', views.NetdiscoDeviceView.as_view(), name="device"),
 
     path('port/', views.NetdiscoPortListView.as_view(), name="port_list"),

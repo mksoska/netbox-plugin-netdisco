@@ -13,11 +13,21 @@
                     <div class="table-responsive">
                         <table class="table table-hover attr-table">                                          
                             <tbody>
-                                {% for key in model.attribute_tag %}
+                                {% for key in model.to_dict %}
                                 <tr class="{% if model.is_consistent == False %}bg-danger{% endif %}">
-                                    <th scope="row">{% getattr_name model key %}</th>
+                                    <th scope="row">
+                                    {% getattr_verbose model key as name %}
+                                    {% if name %}
+                                    {{ name }}
+                                    {% else %}
+                                    {{ key }}
+                                    {% endif %}                                   
+                                    </th>
                                     <td>
-                                        {% getattr_netdisco model key %}                                       
+                                        {% getattr_netdisco model key as attribute %}                                       
+                                        {% if attribute != None %}
+                                        {{ attribute }}
+                                        {% endif %}
                                     </td>
                                     {% if model.is_consistent == False %}                                    
                                     <td class="text-danger">
@@ -25,7 +35,7 @@
                                     </td>
                                     {% endif %}
                                 </tr>
-                                {% endfor %}                               
+                                {% endfor %} 
                             </tbody>                            
                         </table>     
                     </div>

@@ -8,5 +8,9 @@ from ..core import Inventory
 def inventory_collect(request):
     """Trigger Netdisco inventory data retrieval."""
     Inventory.collect()
-    return HttpResponse(status=200)
-
+    response = Inventory.notify()
+    return HttpResponse(
+        content=response.content,
+        status=response.status_code,
+        content_type=response.headers['Content-Type']
+    )

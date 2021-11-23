@@ -9,7 +9,7 @@ from django_tables2 import RequestConfig
 class NetdiscoDeviceListView(View):
     """Display list of devices that are present in Netdisco."""
     
-    entryset = [device.to_dict() for device in Device.objects.values()]
+    entryset = [device.to_dict for device in Device.objects.values()]
 
     def get(self, request):
         "Get device list."
@@ -36,7 +36,7 @@ class NetdiscoDeviceView(View):
 class NetdiscoPortListView(View):
     """Display list of ports that are present in Netdisco."""
 
-    entryset = [port.to_dict() for port in Port.objects.values()]
+    entryset = [port.to_dict for port in Port.objects.values()]
 
     def get(self, request):
         """Get port list."""       
@@ -55,7 +55,7 @@ class NetdiscoDevicePortListView(View):
     def get(self, request, ip):
         """Get port list."""       
         device = Device.objects.get(ip)
-        entryset = [port.to_dict() for port in device.ports]
+        entryset = [port.to_dict for port in device.ports]
         table = PortTable(entryset)
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
 
@@ -97,7 +97,7 @@ class NetdiscoDeviceAddressListView(View):
     def get(self, request, ip):
         """Get address list."""
         device = Device.objects.get(ip)
-        entryset = [address.to_dict() for address in device.addresses]
+        entryset = [address.to_dict for address in device.addresses]
         table = AddressTable(entryset)
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
 

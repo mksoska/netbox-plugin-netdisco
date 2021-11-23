@@ -11,5 +11,5 @@ def getattr_netbox(model, key):
     return model.getattr_netbox(key)
 
 @register.simple_tag
-def getattr_name(model, key):
-    return model.attribute_tag[key]
+def getattr_verbose(model, key):
+    return model.attribute_tag.get(key)

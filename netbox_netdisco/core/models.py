@@ -1,29 +1,18 @@
 from .utilities import sum_consistent, AttributeMap, merge_dicts
 from .netdisco import Netdisco
 
-#import dcim.models
+import dcim.models
+import ipam.models
 import openapi_netdisco.models
 
-
-def initialize(**kwargs):
-    for portutilization in Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs):
-        device = Device._get(portutilization.ip, **kwargs)
-        if Device._is_apimodel(device):
-            Device(device, **kwargs)
-   
-def clear_all():
-    Device.objects.clear()
-    Port.objects.clear()
-    Address.objects.clear()
-    Vlan.objects.clear()
-
-
 class CommonModel():
-    def __init__(self, netdisco, netbox, attribute_map, attribute_tag):
+    def __init__(self, netdisco, netbox, attribute_map, attribute_tag, attribute_value_map):
         self.netdisco = netdisco
         self.netbox = netbox
         self.attribute_map = attribute_map
         self.attribute_tag = attribute_tag
+        self.attribute_value_map = attribute_value_map
+
     
     @property
     def is_consistent(self):
@@ -35,16 +24,18 @@ class CommonModel():
         return True
 
     def getattr_netdisco(self, key):
-        return getattr(self.netdisco, key)    
+        value_map = self.attribute_value_map.get(key, lambda x: x)        
+        return value_map(getattr(self.netdisco, key, None)) 
 
-    def getattr_netbox(self, key): 
-        if not self.netbox:
-            return       
+    def getattr_netbox(self, key):           
         result = self.netbox
         for attr in self.attribute_map[key].split('__'):
-            result = getattr(result, attr)
+            if not result:
+                return
+            result = getattr(result, attr, None)
         return result
-            
+
+    @property        
     def to_dict(self):
         return self.netdisco.to_dict()
 
@@ -54,21 +45,31 @@ class Device(CommonModel):
     objects = {}
 
     def __init__(self, device, **kwargs):
-        attribute_map = AttributeMap({  
+        attribute_map = AttributeMap({
             "ip": "primary_ip4__address",
             "name": "name",
-            "location": "location"
-
+            "location": "location",
+            "vendor": "device_type__manufacturer__name",
+            "model": "device_type__model",
+            "serial": "serial"                    
         }, device)
 
         attribute_tag = {
             "ip": "Management Address",
             "name": "System Name",
+            "dns": "DNS",
             "location": "Location"
         }
+
+        attribute_value_map = {}
         
-        #dcim.models.Device.objects.filter(**attribute_map("ip")).first()
-        super().__init__(device, None, attribute_map.map_, attribute_tag)
+        super().__init__(
+            device,
+            dcim.models.Device.objects.filter(**attribute_map("ip")).first(),
+            attribute_map.map_,
+            attribute_tag,
+            attribute_value_map
+        )
         
         self.ports = [Port(self, port) for port in Port._get_ports(device.ip, **kwargs) if Port._is_apimodel(port)]
         self.addresses = [Address(self, address) for address in Address._get_addresses(device.ip, **kwargs) if Address._is_apimodel(address)]
@@ -76,8 +77,9 @@ class Device(CommonModel):
 
         Device.objects[device.ip] = self  
 
+    @property
     def to_dict(self):
-        return merge_dicts(super().to_dict(), {
+        return merge_dicts(super().to_dict, {
             "ports_inconsistent": sum_consistent(self.ports, False),
             "addresses_inconsistent": sum_consistent(self.addresses, False),
             "vlans_inconsistent": sum_consistent(self.vlans, False)
@@ -99,15 +101,40 @@ class Port(CommonModel):
     def __init__(self, device, port):
         attribute_map = AttributeMap({
             "ip": "device__primary_ip4__address",
-            "port": "name" # or maybe "name": "name"
+            "remote_ip": "_path__destination__device__primary_ip4__address",
+            "port": "name",
+            "remote_port": "_path__destination__name",
+            "desc": "description",
+            "type": "type",
+            "remote_type": "_path__destination__type",
+            "mac": "mac_address",
+            "mtu": "mtu",
+            "pvid": "untagged_vlan_id",
+            "up_admin": "enabled"            
         }, port)
 
-        attribute_tag= {
-            "ip": "Device IP",
+        attribute_tag = {
+            "ip": "Device",
+            "remote_ip": "Neighbor Device",
+            "desc": "Description",
+            "mac": "Mac Address",
+            "mtu": "MTU",
+            "pvid": "Native VLAN",
+            "up_admin": "Enabled"
+        }
+
+        attribute_value_map = {
+            "up": lambda x: x == "Up",
+            "up_admin": lambda x: x == "Up"
         }
         
-        #dcim.models.Interface.objects.filter(**attribute_map("ip", "port")).first()
-        super().__init__(port, None, attribute_map.map_, attribute_tag)
+        super().__init__(
+            port,
+            dcim.models.Interface.objects.filter(**attribute_map("ip", "port")).first(),
+            attribute_map.map_,
+            attribute_tag,
+            attribute_value_map
+        )
 
         self.device = device
         Port.objects[f"{port.ip}_{port.port}"] = self
@@ -127,16 +154,26 @@ class Address(CommonModel):
 
     def __init__(self, device, address):
         attribute_map = AttributeMap({
+            "ip": "interface__device__primary_ip4__address",
             "alias": "address",
-            "ip": "interface__device__primary_ip4__address"
+            "port": "interface__name",
+            "dns": "dns_name"            
         }, address)
 
         attribute_tag = {
+            "ip": "Device",
             "alias": "IP Address",
         }
 
-        #ipam.models.IPAddress.objects.filter(**attribute_map("alias")).first()
-        super().__init__(address, None, attribute_map.map_, attribute_tag)
+        attribute_value_map = {}
+
+        super().__init__(
+            address,
+            ipam.models.IPAddress.objects.filter(**attribute_map("alias")).first(),
+            attribute_map.map_,
+            attribute_tag,
+            attribute_value_map
+        )
 
         self.device = device
         Address.objects[address.alias] = self
@@ -156,15 +193,25 @@ class Vlan(CommonModel):
 
     def __init__(self, device, vlan):
         attribute_map = AttributeMap({
-            "vlan": "vid"
+            "vlan": "vid",
+            "description": "name"
         }, vlan)
 
         attribute_tag = {
-            "vlan": "VLAN ID"
+            "ip": "Device",
+            "vlan": "VLAN ID",
+            "description": "Name"
         }
 
-        #ipam.models.VLAN.objects.filter(**attribute_map("vlan").first()
-        super().__init__(vlan, None, attribute_map.map_, attribute_tag)
+        attribute_value_map = {}
+
+        super().__init__(
+            vlan,
+            ipam.models.VLAN.objects.filter(**attribute_map("vlan")).first(),
+            attribute_map.map_,
+            attribute_tag,
+            attribute_value_map
+        )
 
         self.device = device
         Vlan.objects[f"{vlan.ip}_{vlan.vlan}"] = self
