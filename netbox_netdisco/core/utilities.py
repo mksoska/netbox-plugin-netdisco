@@ -1,6 +1,6 @@
 
-def sum_consistent(models, consistent=True):
-    return sum(1 for model in models if model.is_consistent == consistent)    
+def sum_inconsistent(models):
+    return sum(1 for model in models if not model.is_consistent)    
 
 
 def merge_dicts(*args):

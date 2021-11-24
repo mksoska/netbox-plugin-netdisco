@@ -3,6 +3,7 @@ from django.views.generic import View
 from .core.models import *
 from .tables import *
 from django_tables2 import RequestConfig
+from django.core.paginator import Paginator, Page
 
 
 
@@ -13,8 +14,8 @@ class NetdiscoDeviceListView(View):
 
     def get(self, request):
         """Get device list."""
-        table = DeviceTable(self.entryset, order_by="-ports_inconsistent")
-        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        table = DeviceTable(self.entryset, order_by=("is_consistent, -ports_inconsistent", "-addresses_inconsistent", "-vlans_inconsistent"))
+        table.paginate(page=request.GET.get("page", 1), per_page=25)
 
         return render(
             request, "netbox_netdisco/device_list.html", {"table": table}
@@ -49,8 +50,8 @@ class NetdiscoPortListView(View):
     def get(self, request):
         """Get port list."""       
 
-        table = PortTable(self.entryset)
-        RequestConfig(request, paginate={"per_page": 25}).configure(table)
+        table = PortTable(self.entryset, order_by="is_consistent")
+        table.paginate(page=request.GET.get("page", 1), per_page=25)
 
         return render(
             request, "netbox_netdisco/port_list.html", {"table": table}
@@ -72,7 +73,7 @@ class NetdiscoDevicePortListView(View):
         """Get port list."""       
         device = Device.objects.get(ip)
         entryset = [port.to_dict for port in device.ports]
-        table = PortTable(entryset)
+        table = PortTable(entryset, order_by="is_consistent")
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
 
         return render(
@@ -99,7 +100,7 @@ class NetdiscoAddressListView(View):
 
     def get(self, request):
         """Get address list."""
-        table = AddressTable(self.entryset)
+        table = AddressTable(self.entryset, order_by="is_consistent")
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
 
         return render(
@@ -122,7 +123,7 @@ class NetdiscoDeviceAddressListView(View):
         """Get address list."""
         device = Device.objects.get(ip)
         entryset = [address.to_dict for address in device.addresses]
-        table = AddressTable(entryset)
+        table = AddressTable(entryset, order_by="is_consistent")
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
 
         return render(
@@ -150,7 +151,7 @@ class NetdiscoVlanListView(View):
 
     def get(self, request):
         """Get VLAN list."""
-        table = VlanTable(self.entryset)
+        table = VlanTable(self.entryset, order_by="is_consistent")
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
 
         return render(
@@ -173,7 +174,7 @@ class NetdiscoDeviceVlanListView(View):
         """Get VLAN list."""
         device = Device.objects.get(ip)
         entryset = [vlan.to_dict for vlan in device.vlans]
-        table = VlanTable(entryset)
+        table = VlanTable(entryset, order_by="is_consistent")
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
 
         return render(

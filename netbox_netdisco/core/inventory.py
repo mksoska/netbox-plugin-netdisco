@@ -1,7 +1,7 @@
 from .netdisco import Netdisco
 from .monitoring import Icinga
 from .models import *
-from .utilities import sum_consistent
+from .utilities import sum_inconsistent
 from netbox import settings
 
 
@@ -13,7 +13,7 @@ class Inventory():
         for portutilization in Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs):
             Device._get(portutilization.ip, **kwargs)           
    
-    @staticmethod 
+    @staticmethod
     def clear_all():
         Device.objects.clear()
         Port.objects.clear()
@@ -42,9 +42,9 @@ class Inventory():
 
     @staticmethod
     def notify_inconsistencies(monitoring):
-        comment = f"Inconsistent devices: {sum_consistent(Device.objects.values(), False)}\n"\
-            + f"Inconsistent ports: {sum_consistent(Port.objects.values(), False)}\n"\
-            + f"Inconsistent IP addresses: {sum_consistent(Address.objects.values(), False)}\n"\
-            + f"Inconsistent VLANs: {sum_consistent(Vlan.objects.values(), False)}"
+        comment = f"Inconsistent devices: {sum_inconsistent(Device.objects.values(), False)}\n"\
+            + f"Inconsistent ports: {sum_inconsistent(Port.objects.values(), False)}\n"\
+            + f"Inconsistent IP addresses: {sum_inconsistent(Address.objects.values(), False)}\n"\
+            + f"Inconsistent VLANs: {sum_inconsistent(Vlan.objects.values(), False)}"
         return monitoring.send(comment)
             

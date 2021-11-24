@@ -2,6 +2,11 @@ from django import template
 
 register = template.Library()
 
+
+@register.simple_tag
+def getdict_netdisco(model):
+    return model.netdisco.to_dict()
+
 @register.simple_tag
 def getattr_netdisco(model, key):
     return model.attrs.getattr_netdisco(key)

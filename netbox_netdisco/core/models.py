@@ -1,4 +1,4 @@
-from .utilities import AttributeResolve, sum_consistent, merge_dicts, get_filter
+from .utilities import AttributeResolve, sum_inconsistent, merge_dicts, get_filter
 from .netdisco import Netdisco
 
 import dcim.models
@@ -31,7 +31,7 @@ class CommonModel():
 
     @property        
     def to_dict(self):
-        return self.netdisco.to_dict()
+        return merge_dicts(self.netdisco.to_dict(), {"in_netbox": self.in_netbox, "is_consistent": self.is_consistent})
 
 
 
@@ -49,7 +49,7 @@ class Device(CommonModel):
 
     attribute_verbose = {
         "ip": "Management Address",
-        "name": "System Name",
+        "name": "System Hostname",
         "dns": "DNS",
         "location": "Location"
     }
@@ -72,9 +72,9 @@ class Device(CommonModel):
     @property
     def to_dict(self):
         return merge_dicts(super().to_dict, {
-            "ports_inconsistent": sum_consistent(self.ports, False),
-            "addresses_inconsistent": sum_consistent(self.addresses, False),
-            "vlans_inconsistent": sum_consistent(self.vlans, False)
+            "ports_inconsistent": sum_inconsistent(self.ports),
+            "addresses_inconsistent": sum_inconsistent(self.addresses),
+            "vlans_inconsistent": sum_inconsistent(self.vlans)
         })
 
     @staticmethod
@@ -170,8 +170,8 @@ class Address(CommonModel):
     }
 
     attribute_verbose = {
-            "ip": "Device",
-            "alias": "IP Address",
+        "ip": "Device",
+        "alias": "IP Address",
     }
 
     attribute_convert = {}
