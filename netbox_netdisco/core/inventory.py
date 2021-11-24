@@ -11,9 +11,7 @@ class Inventory():
     @staticmethod
     def initialize(**kwargs):
         for portutilization in Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs):
-            device = Device._get(portutilization.ip, **kwargs)
-            if Device._is_apimodel(device):
-                Device(device, **kwargs)
+            Device._get(portutilization.ip, **kwargs)           
    
     @staticmethod 
     def clear_all():

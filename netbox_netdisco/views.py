@@ -12,13 +12,21 @@ class NetdiscoDeviceListView(View):
     entryset = [device.to_dict for device in Device.objects.values()]
 
     def get(self, request):
-        "Get device list."
+        """Get device list."""
         table = DeviceTable(self.entryset, order_by="-ports_inconsistent")
         RequestConfig(request, paginate={"per_page": 25}).configure(table)
 
         return render(
             request, "netbox_netdisco/device_list.html", {"table": table}
         )
+
+
+class NetdiscoDeviceSearchView(View):
+    """Display list of searched devices that are present in Netdisco."""
+    
+    def get(self, request, search):
+        """Get device list."""
+        pass
 
 
 class NetdiscoDeviceView(View):
@@ -48,6 +56,14 @@ class NetdiscoPortListView(View):
             request, "netbox_netdisco/port_list.html", {"table": table}
         )
 
+
+class NetdiscoPortSearchView(View):
+    """Display list of searched ports that are present in Netdisco."""
+    
+    def get(self, request, search):
+        """Get port list."""
+        pass
+
     
 class NetdiscoDevicePortListView(View):
     """Display list of ports that are present in Netdisco."""
@@ -68,7 +84,7 @@ class NetdiscoPortView(View):
     """Display Netdisco port details."""
     
     def get(self, request, ip, port):
-        """Get device."""
+        """Get port."""
         port = Port.objects.get(f"{ip}_{port}")
 
         return render(
@@ -91,6 +107,14 @@ class NetdiscoAddressListView(View):
         )
 
 
+class NetdiscoAddressSearchView(View):
+    """Display list of searched addresses that are present in Netdisco."""
+    
+    def get(self, request, search):
+        """Get address list."""
+        pass
+
+
 class NetdiscoDeviceAddressListView(View):
     """Display list of addresses that belong to a device in Netdisco."""
 
@@ -110,7 +134,7 @@ class NetdiscoAddressView(View):
     """Display Netdisco IP address details."""
 
     def get(self, request, ip):
-        """Get device."""
+        """Get address."""
         address = Address.objects.get(ip)
 
         return render(
@@ -134,6 +158,14 @@ class NetdiscoVlanListView(View):
         )
 
 
+class NetdiscoVlanSearchView(View):
+    """Display list of searched VLANs that are present in Netdisco."""
+    
+    def get(self, request, search):
+        """Get VLAN list."""
+        pass
+
+
 class NetdiscoDeviceVlanListView(View):
     """Display list of VLANs that belong to a device in Netdisco."""
 
@@ -152,7 +184,7 @@ class NetdiscoDeviceVlanListView(View):
 class NetdiscoVlanView(View):
     """Display Netdisco VLAN details."""
     def get(self, request, ip, id):
-        """Get device."""
+        """Get VLAN."""
         vlan = Vlan.objects.get(f"{ip}_{id}")
 
         return render(

@@ -63,9 +63,9 @@ class Device(CommonModel):
             Device
         )
         
-        self.ports = [Port(self, port) for port in Port._get_ports(device.ip, **kwargs) if Port._is_apimodel(port)]
-        self.addresses = [Address(self, address) for address in Address._get_addresses(device.ip, **kwargs) if Address._is_apimodel(address)]
-        self.vlans = [Vlan(self, vlan) for vlan in Vlan._get_vlans(device.ip, **kwargs) if Vlan._is_apimodel(vlan)]
+        self.ports = Port._get_ports(self, **kwargs)
+        self.addresses = Address._get_addresses(self, **kwargs)
+        self.vlans = Vlan._get_vlans(self, **kwargs)
 
         Device.objects[device.ip] = self  
 
@@ -79,11 +79,23 @@ class Device(CommonModel):
 
     @staticmethod
     def _get(ip, **kwargs):
-        return Netdisco.objects.api_v1_object_device_ip_get(ip, **kwargs)
+        device = Netdisco.objects.api_v1_object_device_ip_get(ip, **kwargs)
+        if Device._is_getmodel(device):
+            return Device(device, **kwargs)
 
     @staticmethod
-    def _is_apimodel(instance):
+    def _search(**kwargs):
+        return [Device.objects.get(device.ip) for device in Netdisco.search.api_v1_search_device_get(**kwargs) if Device._is_searchmodel(device)]
+
+    @staticmethod
+    def _is_getmodel(instance):
         return isinstance(instance, openapi_netdisco.models.Device)
+
+    @staticmethod
+    def _is_searchmodel(instance):
+        return isinstance(instance, openapi_netdisco.models.DeviceSearch)
+
+
          
 
     
@@ -130,12 +142,20 @@ class Port(CommonModel):
         Port.objects[f"{port.ip}_{port.port}"] = self
 
     @staticmethod
-    def _get_ports(ip, **kwargs):
-        return Netdisco.objects.api_v1_object_device_ip_ports_get(ip, **kwargs)
+    def _get_ports(device, **kwargs):
+        return [Port(device, port) for port in Netdisco.objects.api_v1_object_device_ip_ports_get(device.netdisco.ip, **kwargs) if Port._is_getmodel(port)]
     
     @staticmethod
-    def _is_apimodel(instance):
+    def _search(**kwargs):
+        return [Port.objects.get(f"{port.ip}_{port.port}") for port in Netdisco.search.api_v1_search_port_get(**kwargs) if Port._is_searchmodel(port)]
+    
+    @staticmethod
+    def _is_getmodel(instance):
         return isinstance(instance, openapi_netdisco.models.Port)
+
+    @staticmethod
+    def _is_searchmodel(instance):
+        return isinstance(instance, openapi_netdisco.models.PortSearch)
         
 
 
@@ -167,11 +187,15 @@ class Address(CommonModel):
         Address.objects[address.alias] = self
 
     @staticmethod
-    def _get_addresses(ip, **kwargs):
-        return Netdisco.objects.api_v1_object_device_ip_device_ips_get(ip, **kwargs)
-    
+    def _get_addresses(device, **kwargs):
+        return [Address(device, address) for address in Netdisco.objects.api_v1_object_device_ip_device_ips_get(device.netdisco.ip, **kwargs) if Address._is_getmodel(address)]         
+
     @staticmethod
-    def _is_apimodel(instance):
+    def _search(ip):
+        return [address for address in Address.objects.values() if ip in address.netdisco.alias]
+
+    @staticmethod
+    def _is_getmodel(instance):
         return isinstance(instance, openapi_netdisco.models.Address)
 
 
@@ -203,10 +227,18 @@ class Vlan(CommonModel):
         Vlan.objects[f"{vlan.ip}_{vlan.vlan}"] = self
 
     @staticmethod
-    def _get_vlans(ip, **kwargs):
-        return Netdisco.objects.api_v1_object_device_ip_vlans_get(ip, **kwargs)
+    def _get_vlans(device, **kwargs):
+        return [Vlan(device, vlan) for vlan in Netdisco.objects.api_v1_object_device_ip_vlans_get(device.netdisco.ip, **kwargs) if Vlan._is_getmodel(vlan)]
 
     @staticmethod
-    def _is_apimodel(instance):
+    def _search(**kwargs):
+        return [Vlan.objects.get(f"{vlan.ip}_{vlan.vlan}") for vlan in Netdisco.search.api_v1_search_vlan_get(**kwargs) if Vlan._is_searchmodel(vlan)]
+
+    @staticmethod
+    def _is_getmodel(instance):
         return isinstance(instance, openapi_netdisco.models.Vlan)
+
+    @staticmethod
+    def _is_searchmodel(instance):
+        return isinstance(instance, openapi_netdisco.models.VlanSearch)
     
