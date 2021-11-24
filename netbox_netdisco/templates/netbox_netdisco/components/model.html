@@ -14,30 +14,70 @@
                         <table class="table table-hover attr-table">                                          
                             <tbody>
                                 {% for key in model.to_dict %}
-                                <tr class="{% if model.is_consistent == False %}bg-danger{% endif %}">
-                                    <th scope="row">
-                                    {% getattr_verbose model key as name %}
-                                    {% if name %}
-                                    {{ name }}
-                                    {% else %}
-                                    {{ key }}
-                                    {% endif %}                                   
+                                {% getattr_netdisco model key as attr_netdisco %}                            
+                                {% getattr_verbose model key as name %}
+                                <tr>
+                                    <th scope="row">                                                            
+                                        {{ name }}                                                                   
                                     </th>
-                                    <td>
-                                        {% getattr_netdisco model key as attribute %}                                       
-                                        {% if attribute != None %}
-                                        {{ attribute }}
+                                    <td>                                                                               
+                                        {% if attr_netdisco != None %}
+                                        {{ attr_netdisco }}
+                                        {% else %}
+                                        —
                                         {% endif %}
-                                    </td>
-                                    {% if model.is_consistent == False %}                                    
-                                    <td class="text-danger">
-                                        NetBox: {% getattr_netbox model key %}
-                                    </td>
-                                    {% endif %}
+                                    </td>                                                                                                                                          
                                 </tr>
                                 {% endfor %} 
                             </tbody>                            
                         </table>     
+                    </div>
+                </div>           
+            </div>
+        </div>
+        <div class="col col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>
+                        Consistency
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        {% if not model.in_netbox %}
+                        <div class="text-danger">
+                            {{ model_name }} not found in NetBox
+                        </div>
+                        {% else %}
+                        <table class="table table-hover attr-table">                                          
+                            <tbody>
+                                {% for key in model.attrs.attribute_map %}
+                                {% getattr_netdisco model key as attr_netdisco %}
+                                {% getattr_netbox model key as attr_netbox%}
+                                {% getattr_verbose model key as name %}
+                                {% attr_consistent model key as consistent %}
+                                <tr class="{% if not consistent %}border-danger{% else %}{% if attr_netdisco != None %}border-success{% endif %}{% endif %}">
+                                    <th scope="row">                                                           
+                                        {{ name }}                                                                       
+                                    </th>
+                                    <td>                                                                               
+                                        {% if attr_netdisco != None %}
+                                        {{ attr_netdisco }}
+                                        {% else %}
+                                        —
+                                        {% endif %}
+                                    </td>
+                                                                      
+                                    <td class="text-danger">
+                                        {% if consistent == False %}
+                                        NetBox: {{ attr_netbox }}
+                                        {% endif %} 
+                                    </td>                                    
+                                </tr>
+                                {% endfor %} 
+                            </tbody>                            
+                        </table>
+                        {% endif %}     
                     </div>
                 </div>           
             </div>
