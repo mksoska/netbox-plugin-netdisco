@@ -42,9 +42,9 @@ class Inventory():
 
     @staticmethod
     def notify_inconsistencies(monitoring):
-        comment = f"Inconsistent devices: {sum_inconsistent(Device.objects.values(), False)}\n"\
-            + f"Inconsistent ports: {sum_inconsistent(Port.objects.values(), False)}\n"\
-            + f"Inconsistent IP addresses: {sum_inconsistent(Address.objects.values(), False)}\n"\
-            + f"Inconsistent VLANs: {sum_inconsistent(Vlan.objects.values(), False)}"
+        comment = f"Inconsistent devices: {sum_inconsistent(Device.objects.values())}\n"\
+            + f"Inconsistent ports: {sum_inconsistent(Port.objects.values())}\n"\
+            + f"Inconsistent IP addresses: {sum_inconsistent(Address.objects.values())}\n"\
+            + f"Inconsistent VLANs: {sum_inconsistent(Vlan.objects.values())}"
         return monitoring.send(comment)
             
