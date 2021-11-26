@@ -5,13 +5,11 @@ from .utilities import sum_inconsistent
 from netbox import settings
 
 
-class Inventory():
-    # Later add support for AsyncResult (maybe even HTTPResponse) returned from any get method of models
 
-    @staticmethod
-    def initialize(**kwargs):
-        for portutilization in Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs):
-            Device._get(portutilization.ip, **kwargs)           
+
+
+class Inventory():
+    # Later add support for AsyncResult (maybe even HTTPResponse) returned from any get method of models          
    
     @staticmethod
     def clear_all():
@@ -22,10 +20,39 @@ class Inventory():
 
     @staticmethod
     def collect(**kwargs):
+        Inventory.clear_all()
+        Inventory.collect_devices(**kwargs)
+
+    @staticmethod
+    def collect_device(ip, **kwargs):
         with Netdisco(settings.PLUGINS_CONFIG.get("netbox_netdisco")):
-            Inventory.clear_all()
-            Inventory.initialize(**kwargs)
-    
+            Device._get(ip, **kwargs)
+
+    @staticmethod
+    def collect_devices(**kwargs):
+         with Netdisco(settings.PLUGINS_CONFIG.get("netbox_netdisco")):
+            for portutilization in Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs):
+                Device._get(portutilization.ip, **kwargs)
+
+    @staticmethod
+    def collect_port(ip, port, **kwargs): 
+        with Netdisco(settings.PLUGINS_CONFIG.get("netbox_netdisco")):
+            Port._get(ip, port, **kwargs)
+
+    @staticmethod
+    def collect_ports(ip, **kwargs):
+        with Netdisco(settings.PLUGINS_CONFIG.get("netbox_netdisco")):
+            Port._get_ports(ip, **kwargs)
+
+    @staticmethod
+    def collect_addresses(ip, **kwargs):
+        with Netdisco(settings.PLUGINS_CONFIG.get("netbox_netdisco")):
+            Address._get_addresses(ip, **kwargs)
+
+    @staticmethod
+    def collect_vlans(ip, **kwargs):
+        with Netdisco(settings.PLUGINS_CONFIG.get("netbox_netdisco")):
+            Vlan._get_vlans(ip, **kwargs)
             
     @staticmethod
     def notify():
@@ -42,9 +69,9 @@ class Inventory():
 
     @staticmethod
     def notify_inconsistencies(monitoring):
-        comment = f"Inconsistent devices: {sum_inconsistent(Device.objects.values())}\n"\
-            + f"Inconsistent ports: {sum_inconsistent(Port.objects.values())}\n"\
-            + f"Inconsistent IP addresses: {sum_inconsistent(Address.objects.values())}\n"\
-            + f"Inconsistent VLANs: {sum_inconsistent(Vlan.objects.values())}"
+        comment = f"Inconsistent devices: {sum_inconsistent(Device.all())}\n"\
+            + f"Inconsistent ports: {sum_inconsistent(Port.all())}\n"\
+            + f"Inconsistent IP addresses: {sum_inconsistent(Address.all())}\n"\
+            + f"Inconsistent VLANs: {sum_inconsistent(Vlan.all())}"
         return monitoring.send(comment)
             

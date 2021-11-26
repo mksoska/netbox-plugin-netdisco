@@ -4,7 +4,7 @@
 <div class="row">
     <h6>
         <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:address_list' %}">IP Addresses</a> >
-        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:address' ip=address.netdisco.alias %}">{{ address.netdisco.alias }}</a>
+        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:address' alias=address.netdisco.alias ip=address.netdisco.ip %}">{{ address.netdisco.alias }}</a>
     </h6>
 </div>
 {{ address.netdisco.alias }}
@@ -17,7 +17,7 @@
 {% block tabs %}
 <ul class="nav nav-tabs px-3">
     <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="{% url 'plugins:netbox_netdisco:address' ip=address.netdisco.alias %}">
+        <a class="nav-link active" href="{% url 'plugins:netbox_netdisco:address' alias=address.netdisco.alias ip=address.netdisco.ip %}">
             Address
         </a>
     </li>    

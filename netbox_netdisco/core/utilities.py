@@ -15,16 +15,17 @@ def get_filter(model, attribute_map, *args):
 
 
 class AttributeResolve():
-    def __init__(self, netdisco, netbox, attribute_map, attribute_verbose, attribute_convert):
+    def __init__(self, netdisco, netbox, attribute_map, attribute_verbose, netdisco_attr_convert, netbox_attr_convert):
         self.netdisco = netdisco
         self.netbox = netbox
         self.attribute_map = attribute_map
         self.attribute_verbose = attribute_verbose
-        self.attribute_convert = attribute_convert
+        self.netdisco_attr_convert = netdisco_attr_convert
+        self.netbox_attr_convert = netbox_attr_convert
 
-    def getattr_netdisco(self, key):
-        convert = self.attribute_convert.get(key, lambda x: x)     
-        return convert(getattr(self.netdisco, key, None))
+    def getattr_netdisco(self, key, netdisco=None):
+        convert = self.netdisco_attr_convert.get(key, lambda x: x)     
+        return convert(getattr(netdisco if netdisco else self.netdisco, key, None))
 
     def getattr_netbox(self, key):
         path = self.attribute_map.get(key)
@@ -35,7 +36,8 @@ class AttributeResolve():
             if not dest:
                 return
             dest = getattr(dest, attr, None)
-        return dest
+        convert = self.netbox_attr_convert.get(key, lambda x: x)
+        return convert(str(dest) if not isinstance(dest, int) else dest)
 
     def getattr_verbose(self, key):
         verbose = self.attribute_verbose.get(key)

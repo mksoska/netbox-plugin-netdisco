@@ -17,8 +17,12 @@ def port_list_url(record):
     return reverse("plugins:netbox_netdisco:device_port_list", kwargs={"ip": record["ip"]})
 
 
-def address_url(value):
-    return reverse("plugins:netbox_netdisco:address", kwargs={"ip": value})
+def address_url(record):
+    return reverse("plugins:netbox_netdisco:address", kwargs={"alias": record["alias"], "ip": record["ip"]})
+
+
+def primary_ip_url(value):
+    return reverse("plugins:netbox_netdisco:address", kwargs={"alias": value, "ip": value})
 
 
 def address_list_url(record):
@@ -42,7 +46,7 @@ consistency_color = {
 class DeviceTable(tables.Table):
     name = tables.Column(linkify=device_url, verbose_name="Device")
     location = tables.Column()
-    ip = tables.Column(linkify=address_url, verbose_name="Management IP")
+    ip = tables.Column(linkify=primary_ip_url, verbose_name="Management IP")
     dns = tables.Column(verbose_name="DNS")
     model = tables.Column()
     os = tables.Column(verbose_name="OS")

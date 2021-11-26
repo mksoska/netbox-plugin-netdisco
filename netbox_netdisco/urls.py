@@ -14,7 +14,7 @@ urlpatterns = [
     path('address/', views.NetdiscoAddressListView.as_view(), name="address_list"),
     #path('address/search/<search>', views.NetdiscoAddressSearchView.as_view(), name="address_search"),
     path('device/<ip>/address/', views.NetdiscoDeviceAddressListView.as_view(), name="device_address_list"),
-    path('address/<ip>/', views.NetdiscoAddressView.as_view(), name="address"),
+    path('address/<alias>/device/<ip>/', views.NetdiscoAddressView.as_view(), name="address"),
 
     path('vlan/', views.NetdiscoVlanListView.as_view(), name="vlan_list"),
     #path('vlan/search/<search>', views.NetdiscoVlanSearchView.as_view(), name="vlan_search"),
