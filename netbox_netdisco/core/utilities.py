@@ -10,8 +10,8 @@ def merge_dicts(*args):
     return result
 
 
-def get_filter(model, attribute_map, *args):
-    return {attribute_map[arg]: getattr(model, arg) for arg in args}
+def get_orm(expression):
+    return expression.replace('.', '__')
 
 
 class AttributeResolve():
@@ -23,21 +23,21 @@ class AttributeResolve():
         self.netdisco_attr_convert = netdisco_attr_convert
         self.netbox_attr_convert = netbox_attr_convert
 
-    def getattr_netdisco(self, key, netdisco=None):
-        convert = self.netdisco_attr_convert.get(key, lambda x: x)     
-        return convert(getattr(netdisco if netdisco else self.netdisco, key, None))
+    def getattr_netdisco(self, key):
+        return self._getattr_generic("self.netdisco.", key, self.netdisco_attr_convert.get(key, lambda x: x))
 
     def getattr_netbox(self, key):
-        path = self.attribute_map.get(key)
-        if not path:
-            return
-        dest = self.netbox
-        for attr in path.split('__'):
-            if not dest:
-                return
-            dest = getattr(dest, attr, None)
-        convert = self.netbox_attr_convert.get(key, lambda x: x)
-        return convert(str(dest) if not isinstance(dest, int) else dest)
+        return self._getattr_generic("self.netbox.", self.attribute_map.get(key), self.netbox_attr_convert.get(key, lambda x: str(x)))
+
+    def _getattr_generic(self, base, expression, convert):
+        try:
+            if expression:
+                value = eval(base + expression)
+            if value:
+                return convert(value)
+        except AttributeError:
+            return None
+        
 
     def getattr_verbose(self, key):
         verbose = self.attribute_verbose.get(key)

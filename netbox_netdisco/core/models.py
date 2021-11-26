@@ -1,4 +1,4 @@
-from .utilities import AttributeResolve, sum_inconsistent, merge_dicts, get_filter
+from .utilities import AttributeResolve, sum_inconsistent, merge_dicts, get_orm
 from .netdisco import Netdisco
 
 import dcim.models
@@ -40,11 +40,11 @@ class Device(CommonModel):
     objects = {}
 
     attribute_map = {
-        "ip": "primary_ip4__address",
+        "ip": "primary_ip4.address",
         "name": "name",
         "location": "location",
-        "vendor": "device_type__manufacturer__name",
-        "model": "device_type__model",
+        "vendor": "device_type.manufacturer.name",
+        "model": "device_type.model",
         "serial": "serial"                    
     }
 
@@ -58,18 +58,12 @@ class Device(CommonModel):
     netdisco_attr_convert = {}
 
     netbox_attr_convert = {
-        "ip": lambda x: x.split('/')[0]
+        "ip": lambda x: str(x).split('/')[0]
     }
 
-    def __init__(self, device_netdisco, **kwargs):
-        ################
-        Address._get_addresses(device_netdisco.ip, **kwargs)
-        Port._get_ports(device_netdisco.ip, **kwargs)
-        Vlan._get_vlans(device_netdisco.ip, **kwargs)
-        ################
-           
+    def __init__(self, device_netdisco):
         device_netbox = dcim.models.Device.objects.filter(**{
-            self.attribute_map["ip"]: device_netdisco.ip + Address.get_primary_mask(device_netdisco.ip)
+            get_orm(self.attribute_map["ip"]): device_netdisco.ip + Address.get_primary_mask(device_netdisco.ip)
         }).first()
         
         super().__init__(
@@ -112,6 +106,7 @@ class Device(CommonModel):
 
     @staticmethod
     def _is_getmodel(instance):
+        # Later add support for AsyncResult (maybe even HTTPResponse) returned from any get method of models #  
         return isinstance(instance, openapi_netdisco.models.Device)
 
     @staticmethod
@@ -132,13 +127,13 @@ class Port(CommonModel):
     objects = {}
 
     attribute_map = {
-        "ip": "device__primary_ip4__address",
-        "remote_ip": "_path__destination__device__primary_ip4__address",
+        "ip": "device.primary_ip4.address",
+        "remote_ip": "_path.destination.device.primary_ip4.address",
         "port": "name",
-        "remote_port": "_path__destination__name",
+        "remote_port": "_path.destination.name",
         "desc": "description",
         "type": "type",
-        "remote_type": "_path__destination__type",
+        "remote_type": "_path.destination.type",
         "mac": "mac_address",
         "mtu": "mtu",
         "pvid": "untagged_vlan_id",
@@ -161,13 +156,13 @@ class Port(CommonModel):
     }
 
     netbox_attr_convert = {
-        "ip": lambda x: x.split('/')[0]
+        "ip": lambda x: str(x).split('/')[0]
     }
 
     def __init__(self, port_netdisco):
         port_netbox = dcim.models.Interface.objects.filter(**{
-            self.attribute_map["ip"]: port_netdisco.ip + Address.get_primary_mask(port_netdisco.ip),
-            self.attribute_map["port"]: port_netdisco.port
+            get_orm(self.attribute_map["ip"]): port_netdisco.ip + Address.get_primary_mask(port_netdisco.ip),
+            get_orm(self.attribute_map["port"]): port_netdisco.port
         }).first()
 
         super().__init__(
@@ -215,10 +210,10 @@ class Address(CommonModel):
     objects = {}
 
     attribute_map = {
-        "ip": "interface__device__primary_ip4__address",
+        "ip": 'interface.get(name=self.netdisco.port).device.primary_ip4.address',
         "alias": "address",
         "subnet": "address",
-        "port": "interface__name",
+        "port": "interface.name",
         "dns": "dns_name"            
     }
 
@@ -231,14 +226,14 @@ class Address(CommonModel):
     netdisco_attr_convert = {}
 
     netbox_attr_convert = {
-        "ip": lambda x: x.split('/')[0],
-        "alias": lambda x: x.split('/')[0],
-        "subnet": lambda x: x.split('/')[1]
+        "ip": lambda x: str(x).split('/')[0],
+        "alias": lambda x: str(x).split('/')[0],
+        "subnet": lambda x: str(x).split('/')[1]
     }
 
     def __init__(self, address_netdisco):
         address_netbox = ipam.models.IPAddress.objects.filter(**{
-            self.attribute_map["alias"]: address_netdisco.alias + '/' + address_netdisco.subnet.split('/')[1]
+            get_orm(self.attribute_map["alias"]): address_netdisco.alias + '/' + address_netdisco.subnet.split('/')[1]
         }).first()
 
         super().__init__(
@@ -295,12 +290,12 @@ class Vlan(CommonModel):
     netdisco_attr_convert = {}
 
     netbox_attr_convert = {
-        "ip": lambda x: x.split('/')[0]
+        "ip": lambda x: str(x).split('/')[0]
     }
 
     def __init__(self, vlan_netdisco):
         vlan_netbox = ipam.models.VLAN.objects.filter(**{
-            self.attribute_map["vlan"]: vlan_netdisco.vlan
+            get_orm(self.attribute_map["vlan"]): vlan_netdisco.vlan
         }).first()
 
         super().__init__(
@@ -333,5 +328,5 @@ class Vlan(CommonModel):
 
     @staticmethod
     def get(ip, vlan):
-        return Port.objects.get(ip, {}).get(vlan)
+        return Vlan.objects.get(ip, {}).get(vlan)
     

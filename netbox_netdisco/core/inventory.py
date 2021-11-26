@@ -5,11 +5,7 @@ from .utilities import sum_inconsistent
 from netbox import settings
 
 
-
-
-
-class Inventory():
-    # Later add support for AsyncResult (maybe even HTTPResponse) returned from any get method of models          
+class Inventory():      
    
     @staticmethod
     def clear_all():
@@ -22,6 +18,10 @@ class Inventory():
     def collect(**kwargs):
         Inventory.clear_all()
         Inventory.collect_devices(**kwargs)
+        for device in Device.all():
+            Inventory.collect_addresses(device.netdisco.ip, **kwargs)
+            Inventory.collect_ports(device.netdisco.ip, **kwargs)
+            Inventory.collect_vlans(device.netdisco.ip, **kwargs)
 
     @staticmethod
     def collect_device(ip, **kwargs):
