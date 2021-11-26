@@ -1,2 +1,2 @@
 from .inventory import Inventory
-Inventory.collect()
+#Inventory.collect()

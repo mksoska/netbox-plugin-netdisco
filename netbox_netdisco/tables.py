@@ -101,7 +101,7 @@ class AddressTable(tables.Table):
 
 
 class VlanTable(tables.Table):
-    vlan = tables.Column(verbose_name="VLAN ID")
+    vlan = tables.Column(linkify=vlan_url, verbose_name="VLAN ID")
     ip = tables.Column(linkify=device_url, verbose_name="Device")
     description = tables.Column()
     is_consistent = tables.Column(attrs=consistency_color)

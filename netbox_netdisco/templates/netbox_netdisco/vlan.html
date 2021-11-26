@@ -4,7 +4,7 @@
 <div class="row">
     <h6>
         <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:vlan_list' %}">VLANs</a> >
-        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:vlan' ip=vlan.netdisco.ip id=vlan.netdisco.vlan %}">ID {{ vlan.netdisco.vlan }}</a>
+        <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:vlan' id=vlan.netdisco.vlan ip=vlan.netdisco.ip %}">ID {{ vlan.netdisco.vlan }}</a>
     </h6>
 </div>
 VLAN {{ vlan.netdisco.vlan }}
@@ -17,7 +17,7 @@ VLAN {{ vlan.netdisco.vlan }}
 {% block tabs %}
 <ul class="nav nav-tabs px-3">
     <li role="presentation" class="nav-item">
-        <a class="nav-link active" href="{% url 'plugins:netbox_netdisco:vlan' ip=vlan.netdisco.ip id=vlan.netdisco.vlan %}">
+        <a class="nav-link active" href="{% url 'plugins:netbox_netdisco:vlan' id=vlan.netdisco.vlan ip=vlan.netdisco.ip %}">
             VLAN
         </a>
     </li>    

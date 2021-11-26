@@ -50,8 +50,13 @@
                             {{ model_name }} not found in NetBox
                         </div>
                         {% else %}
-                        <table class="table table-hover attr-table">                                          
+                        <table class="table table-hover attr-table">                                                                    
                             <tbody>
+                                <tr>
+                                    <th></th>
+                                    <th>Netdisco</th>
+                                    <th>Netbox</th>
+                                </tr>
                                 {% for key in model.attrs.attribute_map %}
                                 {% getattr_netdisco model key as attr_netdisco %}
                                 {% getattr_netbox model key as attr_netbox%}
@@ -71,7 +76,7 @@
                                                                       
                                     <td class="text-danger">
                                         {% if consistent == False %}
-                                        NetBox: {{ attr_netbox }}
+                                        {{ attr_netbox }}
                                         {% endif %} 
                                     </td>                                    
                                 </tr>
