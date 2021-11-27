@@ -10,8 +10,9 @@ def merge_dicts(*args):
     return result
 
 
-def get_orm(expression):
-    return expression.replace('.', '__')
+def get_orm(orm_map, model_netdisco, queryset):
+    query = {orm_map[key]: getattr(model_netdisco, key) for key in orm_map} if orm_map else None
+    return queryset.filter(**query).first() if query else None
 
 
 class AttributeResolve():

@@ -1,6 +1,9 @@
 DEVICE = {
+    "ORM_MAP": {
+        "ip": "primary_ip4__address__contains"
+    },
+
     "ATTRIBUTE_MAP": {        
-        "ip": "primary_ip4.address", # required
         "name": "name",
         "location": "location",
         "vendor": "device_type.manufacturer.name",
@@ -26,10 +29,13 @@ DEVICE = {
 
 
 PORT = {
-    "ATTRIBUTE_MAP": {
-        "ip": "device.primary_ip4.address",
+    "ORM_MAP": {
+        "ip": "device__primary_ip4__address__contains",
+        "port": "name"
+    }, 
+
+    "ATTRIBUTE_MAP": {        
         "remote_ip": "_path.destination.device.primary_ip4.address",
-        "port": "name",
         "remote_port": "_path.destination.name",
         "desc": "description",
         "type": "type",
@@ -64,9 +70,12 @@ PORT = {
 
 
 ADDRESS = {
+    "ORM_MAP": {
+        "alias": "address__contains",
+    },
+
     "ATTRIBUTE_MAP": {
         "ip": 'interface.get(name=self.netdisco.port).device.primary_ip4.address',
-        "alias": "address", # required
         "subnet_": "address",
         "port": "interface.name",
         "dns": "dns_name"            
@@ -84,7 +93,6 @@ ADDRESS = {
 
     "NETBOX_ATTR_CONVERT": {
         "ip": lambda x: str(x).split('/')[0],
-        "alias": lambda x: str(x).split('/')[0],
         "subnet_": lambda x: '/' + str(x).split('/')[1]
     },
 
@@ -93,8 +101,12 @@ ADDRESS = {
 
 
 VLAN = {
-    "ATTRIBUTE_MAP": {
-        "vlan": "vid",
+    "ORM_MAP": {
+        "vlan": "vid"
+    },
+
+    "ATTRIBUTE_MAP": {  
+        #TODO: ip      
         "description": "name"
     },
 

@@ -42,16 +42,10 @@ class Device(CommonModel):
 
     attr_config = getattr(configuration, "DEVICE", getattr(defaults, "DEVICE"))
 
-    def __init__(self, device_netdisco):
-        netbox_ip_path = Device.attr_config.get("ATTRIBUTE_MAP", {}).get("ip")
-
-        device_netbox = dcim.models.Device.objects.filter(**{
-            get_orm(netbox_ip_path + ".contains"): device_netdisco.ip
-        }).first() if netbox_ip_path else None
-        
+    def __init__(self, device_netdisco):        
         super().__init__(
             device_netdisco,
-            device_netbox,
+            get_orm(Device.attr_config.get("ORM_MAP"), device_netdisco, dcim.models.Device.objects),
             Device.attr_config
         )        
 
@@ -111,19 +105,10 @@ class Port(CommonModel):
 
     attr_config = getattr(configuration, "PORT", getattr(defaults, "PORT"))
 
-    def __init__(self, port_netdisco):
-        netbox_ip_path = Port.attr_config.get("ATTRIBUTE_MAP", {}).get("ip")
-        netbox_port_path = Port.attr_config.get("ATTRIBUTE_MAP", {}).get("port")
-        
-        port_netbox = dcim.models.Interface.objects.filter(**{
-            get_orm(netbox_ip_path + ".contains"): port_netdisco.ip,
-            get_orm(netbox_port_path): port_netdisco.port
-        }).first() if netbox_ip_path and netbox_port_path else None
-        
-
+    def __init__(self, port_netdisco):       
         super().__init__(
             port_netdisco,
-            port_netbox,
+            get_orm(Port.attr_config.get("ORM_MAP"), port_netdisco, dcim.models.Interface.objects),
             Port.attr_config
         )
 
@@ -167,16 +152,10 @@ class Address(CommonModel):
 
     attr_config = getattr(configuration, "ADDRESS", getattr(defaults, "ADDRESS"))
     
-    def __init__(self, address_netdisco):
-        netbox_alias_path = Address.attr_config.get("ATTRIBUTE_MAP", {}).get("alias")
-
-        address_netbox = ipam.models.IPAddress.objects.filter(**{
-            get_orm(netbox_alias_path + ".contains"): address_netdisco.alias
-        }).first() if netbox_alias_path else None
-
+    def __init__(self, address_netdisco):               
         super().__init__(
             address_netdisco,
-            address_netbox,
+            get_orm(Address.attr_config.get("ORM_MAP"), address_netdisco, ipam.models.IPAddress.objects),
             Address.attr_config,
         )
         
@@ -208,16 +187,10 @@ class Vlan(CommonModel):
 
     attr_config = getattr(configuration, "VLAN", getattr(defaults, "VLAN"))
 
-    def __init__(self, vlan_netdisco):
-        netbox_vlan_path = Vlan.attr_config.get("ATTRIBUTE_MAP", {}).get("vlan")
-
-        vlan_netbox = ipam.models.VLAN.objects.filter(**{
-            get_orm(netbox_vlan_path): vlan_netdisco.vlan
-        }).first() if netbox_vlan_path else None
-
+    def __init__(self, vlan_netdisco): 
         super().__init__(
             vlan_netdisco,
-            vlan_netbox,
+            get_orm(Vlan.attr_config.get("ORM_MAP"), vlan_netdisco, ipam.models.VLAN.objects),
             Vlan.attr_config,
         )
 
