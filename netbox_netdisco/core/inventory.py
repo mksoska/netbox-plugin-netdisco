@@ -12,10 +12,10 @@ class Inventory():
 
     @staticmethod
     def collect(**kwargs):
-        Inventory.collect_addresses(**kwargs)
-        Inventory.collect_ports(**kwargs)
-        Inventory.collect_vlans(**kwargs)
         Inventory.collect_devices(**kwargs)
+        Inventory.collect_ports(**kwargs)
+        Inventory.collect_addresses(**kwargs)
+        Inventory.collect_vlans(**kwargs)
 
     @classmethod
     def collect_device(cls, ip, **kwargs):

@@ -46,7 +46,7 @@ class Device(CommonModel):
         netbox_ip_path = Device.attr_config.get("ATTRIBUTE_MAP", {}).get("ip")
 
         device_netbox = dcim.models.Device.objects.filter(**{
-            get_orm(netbox_ip_path): device_netdisco.ip + Address.get_primary_mask(device_netdisco.ip)
+            get_orm(netbox_ip_path + ".contains"): device_netdisco.ip
         }).first() if netbox_ip_path else None
         
         super().__init__(
@@ -116,7 +116,7 @@ class Port(CommonModel):
         netbox_port_path = Port.attr_config.get("ATTRIBUTE_MAP", {}).get("port")
         
         port_netbox = dcim.models.Interface.objects.filter(**{
-            get_orm(netbox_ip_path): port_netdisco.ip + Address.get_primary_mask(port_netdisco.ip),
+            get_orm(netbox_ip_path + ".contains"): port_netdisco.ip,
             get_orm(netbox_port_path): port_netdisco.port
         }).first() if netbox_ip_path and netbox_port_path else None
         
@@ -171,7 +171,7 @@ class Address(CommonModel):
         netbox_alias_path = Address.attr_config.get("ATTRIBUTE_MAP", {}).get("alias")
 
         address_netbox = ipam.models.IPAddress.objects.filter(**{
-            get_orm(netbox_alias_path): address_netdisco.alias + '/' + address_netdisco.subnet.split('/')[1]
+            get_orm(netbox_alias_path + ".contains"): address_netdisco.alias
         }).first() if netbox_alias_path else None
 
         super().__init__(
@@ -181,10 +181,6 @@ class Address(CommonModel):
         )
         
         Address.objects.setdefault(address_netdisco.ip, {})[address_netdisco.alias] = self
-
-    @property
-    def mask(self):
-        return '/' + self.netdisco.subnet.split('/')[1]
 
     @staticmethod
     def _get_addresses(ip, **kwargs):
@@ -197,14 +193,6 @@ class Address(CommonModel):
     @staticmethod
     def _is_getmodel(instance):
         return isinstance(instance, openapi_netdisco.models.Address)
-
-    @staticmethod
-    def get_primary_mask(ip):
-        address = Address.get(ip, ip)
-        if not address:
-            Address._get_addresses(ip)
-            address = Address.get(ip, ip)
-        return getattr(address, "mask", "")
 
     @staticmethod
     def all():
