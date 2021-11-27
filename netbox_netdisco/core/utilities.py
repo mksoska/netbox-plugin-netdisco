@@ -24,7 +24,8 @@ class AttributeResolve():
         self.netbox_attr_convert = netbox_attr_convert
 
     def getattr_netdisco(self, key):
-        return self._getattr_generic("self.netdisco.", key, self.netdisco_attr_convert.get(key, lambda x: x))
+        unmangled = key.rstrip('_')
+        return self._getattr_generic("self.netdisco.", unmangled, self.netdisco_attr_convert.get(key, lambda x: x))
 
     def getattr_netbox(self, key):
         return self._getattr_generic("self.netbox.", self.attribute_map.get(key), self.netbox_attr_convert.get(key, lambda x: str(x)))

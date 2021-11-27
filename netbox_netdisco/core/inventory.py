@@ -5,26 +5,17 @@ from .utilities import sum_inconsistent
 from netbox import settings
 
 
-class Inventory(): 
+class Inventory():
     plugin_config = settings.PLUGINS_CONFIG.get("netbox_netdisco")
 
-    device_set = "Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs)"
-   
-    @staticmethod
-    def clear_all():
-        Device.objects.clear()
-        Port.objects.clear()
-        Address.objects.clear()
-        Vlan.objects.clear()
+    device_set = "Netdisco.reports.api_v1_report_device_portutilization_get(**kwargs)"     
 
     @staticmethod
     def collect(**kwargs):
-        Inventory.clear_all()
+        Inventory.collect_addresses(**kwargs)
+        Inventory.collect_ports(**kwargs)
+        Inventory.collect_vlans(**kwargs)
         Inventory.collect_devices(**kwargs)
-        for device in Device.all():
-            Inventory.collect_addresses(device.netdisco.ip, **kwargs)
-            Inventory.collect_ports(device.netdisco.ip, **kwargs)
-            Inventory.collect_vlans(device.netdisco.ip, **kwargs)
 
     @classmethod
     def collect_device(cls, ip, **kwargs):
@@ -33,7 +24,8 @@ class Inventory():
 
     @classmethod
     def collect_devices(cls, **kwargs):
-         with Netdisco(cls.plugin_config):
+        Device.objects.clear()
+        with Netdisco(cls.plugin_config):
             for device in eval(cls.device_set):
                 Device._get(device.ip, **kwargs)
 
@@ -41,6 +33,7 @@ class Inventory():
     def collect_port(cls, ip, port, **kwargs): 
         with Netdisco(cls.plugin_config):
             Port._get(ip, port, **kwargs)
+            
 
     @classmethod
     def collect_device_ports(cls, ip, **kwargs): 
@@ -49,6 +42,7 @@ class Inventory():
 
     @classmethod
     def collect_ports(cls, **kwargs):
+        Port.objects.clear()
         with Netdisco(cls.plugin_config):
             for device in eval(cls.device_set):
                 Port._get_ports(device.ip, **kwargs)
@@ -57,9 +51,11 @@ class Inventory():
     def collect_device_addresses(cls, ip, **kwargs):
         with Netdisco(cls.plugin_config):
             Address._get_addresses(ip, **kwargs)
+            
 
     @classmethod
     def collect_addresses(cls, **kwargs):
+        Address.objects.clear()
         with Netdisco(cls.plugin_config):
             for device in eval(cls.device_set):
                 Address._get_addresses(device.ip, **kwargs)
@@ -71,6 +67,7 @@ class Inventory():
 
     @classmethod
     def collect_vlans(cls, **kwargs):
+        Vlan.objects.clear()
         with Netdisco(cls.plugin_config):
             for device in eval(cls.device_set):
                 Vlan._get_vlans(device.ip, **kwargs)
