@@ -27,4 +27,4 @@ def getattr_verbose(model, key):
 @register.simple_tag
 def gethost_netdisco():
     host = settings.PLUGINS_CONFIG.get("netbox_netdisco", {}).get("NETDISCO_HOST")
-    return host if host[len(host)] == '/' else host + '/'
+    return host if host[len(host) - 1] == '/' else host + '/'
