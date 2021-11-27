@@ -1,6 +1,5 @@
 {% extends 'netbox_netdisco/components/list.html' %}
 
-
 {% block title %}
 {% if device %}
 <div class="row">
@@ -21,9 +20,19 @@ IP Addresses
 {% else %}
 <h5>Netdisco</h5>
 {% endif %}
+{% endblock %}
 
+{% include 'netbox_netdisco/components/controls.html' %}
+
+{% block controls %}
+<div class="controls">
+    <div class="control-group">
+        <a class="btn btn-sm btn-primary" href="?q=reload" role="button">Refresh</a>
+    </div>
+</div>
 {% endblock %}
 
 {% block search %}
 TO BE IMPLEMENTED
 {%endblock  %}
+

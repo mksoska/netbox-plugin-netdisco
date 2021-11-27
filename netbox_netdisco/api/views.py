@@ -49,10 +49,17 @@ def collect_device(request, ip):
     Inventory.collect_device(ip)
     return collect_response(f"Device {ip} ")
 
+
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-def collect_ports(request, ip):
-    Inventory.collect_ports(ip)
+def collect_ports(request):
+    Inventory.collect_ports()
+    return collect_response("Ports ")
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def collect_device_ports(request, ip):
+    Inventory.collect_device_ports(ip)
     return collect_response("Ports of device {ip} ")
 
 
@@ -65,14 +72,27 @@ def collect_port(request, ip, port):
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-def collect_addresses(request, ip):
-    Inventory.collect_addresses(ip)
+def collect_addresses(request):
+    Inventory.collect_addresses()
+    return collect_response("IP addresses ")
+
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def collect_device_addresses(request, ip):
+    Inventory.collect_device_addresses(ip)
     return collect_response("IP addresses of device {ip} ")
 
 
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
-def collect_vlans(request, ip):
-    Inventory.collect_vlans(ip)
+def collect_vlans(request):
+    Inventory.collect_vlans()
+    return collect_response("VLANs of device {ip} ")
+
+@api_view(['POST'])
+@permission_classes((permissions.AllowAny,))
+def collect_device_vlans(request, ip):
+    Inventory.collect_device_vlans(ip)
     return collect_response("VLANs of device {ip} ")
 

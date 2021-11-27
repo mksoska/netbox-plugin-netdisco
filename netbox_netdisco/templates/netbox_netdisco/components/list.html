@@ -1,6 +1,15 @@
 {% extends 'base/layout.html' %}
 {% load render_table from django_tables2 %}
 
+{% block controls %}
+<div class="controls">
+    <div class="control-group">
+        {% block extra_controls %}{% endblock %}
+        <a class="btn btn-sm btn-primary" href="?q=reload" role="button">Refresh</a>
+    </div>
+</div>
+{% endblock %}
+
 {% block tabs %}
 <ul class="nav nav-tabs px-3">
     <li class="nav-item" role="presentation">

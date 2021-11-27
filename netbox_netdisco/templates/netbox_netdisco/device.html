@@ -1,4 +1,5 @@
-{% extends 'base/layout.html' %}
+{% extends 'netbox_netdisco/components/entry.html' %}
+{% load custom_tags %}
 
 {% block title %}
 <div class="row">
@@ -12,6 +13,10 @@
 
 {% block subtitle %}
 <h5>Netdisco</h5>
+{% endblock %}
+
+{% block extra_controls %}
+<a class="btn btn-sm btn-danger" target="_blank" href="{% gethost_netdisco %}device?tab=netmap&q={{ device.netdisco.name }}&mapshow=neighbors&vlan=&colorby=speed&dynamicsize=on" role="button">Show Topology</a>
 {% endblock %}
 
 {% block tabs %}

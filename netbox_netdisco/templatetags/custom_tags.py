@@ -1,4 +1,5 @@
 from django import template
+from netbox import settings
 
 register = template.Library()
 
@@ -22,3 +23,8 @@ def attr_consistent(model, key):
 @register.simple_tag
 def getattr_verbose(model, key):
     return model.attrs.getattr_verbose(key)
+
+@register.simple_tag
+def gethost_netdisco():
+    host = settings.PLUGINS_CONFIG.get("netbox_netdisco", {}).get("NETDISCO_HOST")
+    return host if host[len(host)] == '/' else host + '/'

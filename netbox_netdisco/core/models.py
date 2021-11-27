@@ -102,7 +102,7 @@ class Device(CommonModel):
 
     @staticmethod
     def _search(**kwargs):
-        return [Device.objects.get(device.ip) for device in Netdisco.search.api_v1_search_device_get(**kwargs) if Device._is_searchmodel(device)]
+        return [Device.get(device.ip) for device in Netdisco.search.api_v1_search_device_get(**kwargs) if Device._is_searchmodel(device)]
 
     @staticmethod
     def _is_getmodel(instance):
