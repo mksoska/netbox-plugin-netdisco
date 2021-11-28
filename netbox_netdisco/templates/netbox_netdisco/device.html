@@ -17,6 +17,9 @@
 
 {% block extra_controls %}
 <a class="btn btn-sm btn-danger" target="_blank" href="{% gethost_netdisco %}device?tab=netmap&q={{ device.netdisco.name }}&mapshow=neighbors&vlan=&colorby=speed&dynamicsize=on" role="button">Show Topology</a>
+{% if device.in_netbox %}
+    <a class="btn btn-sm btn-warning" target="_blank" href="{% url 'dcim:device' pk=device.netbox.pk %}" role="button">Show in Netbox</a>
+{% endif %}
 {% endblock %}
 
 {% block tabs %}

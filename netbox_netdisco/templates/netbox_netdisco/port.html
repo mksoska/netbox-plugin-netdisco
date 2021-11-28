@@ -14,6 +14,12 @@
 <h5>Netdisco</h5>
 {% endblock %}
 
+{% block extra_controls %}
+{% if port.in_netbox %}
+    <a class="btn btn-sm btn-warning" target="_blank" href="{% url 'dcim:interface' pk=port.netbox.pk %}" role="button">Show in Netbox</a>
+{% endif %}
+{% endblock %}
+
 {% block tabs %}
 <ul class="nav nav-tabs px-3">
     <li role="presentation" class="nav-item">

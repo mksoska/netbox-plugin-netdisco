@@ -78,7 +78,7 @@ ADDRESS = {
     "ATTRIBUTE_MAP": {
         "ip": 'interface.get(name=self.netdisco.port).device.primary_ip4.address',
         "subnet_": "address",
-        "port": "interface.name",
+        "port": "interface.get(name=self.netdisco.port).name",
         "dns": "dns_name"            
     },
 

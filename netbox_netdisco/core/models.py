@@ -26,6 +26,8 @@ class CommonModel():
 
     @property
     def is_consistent(self):
+        if not self.in_netbox:
+            return False
         for key in self.attrs.attribute_map:            
             if self.attrs.attr_consistent(key) == False:
                 return False

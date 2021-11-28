@@ -37,8 +37,8 @@ class AttributeResolve():
                 value = eval(base + expression)
             if value:
                 return convert(value)
-        except AttributeError:
-            return None
+        except BaseException:
+            return None 
         
 
     def getattr_verbose(self, key):
