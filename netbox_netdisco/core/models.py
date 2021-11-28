@@ -15,9 +15,9 @@ class CommonModel():
             self.netdisco,
             self.netbox,
             attr_config.get("ATTRIBUTE_MAP", {}), 
-            attr_config.get("ATTRIBUTE_VERBOSE", {}),
             attr_config.get("NETDISCO_ATTR_CONVERT", {}), 
-            attr_config.get("NETBOX_ATTR_CONVERT", {})
+            attr_config.get("NETBOX_ATTR_CONVERT", {}),
+            attr_config.get("VERBOSE_NAME", {})
         )
 
     @property

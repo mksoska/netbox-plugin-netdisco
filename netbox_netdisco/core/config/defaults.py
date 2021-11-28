@@ -9,19 +9,19 @@ DEVICE = {
         "vendor": "device_type.manufacturer.name",
         "model": "device_type.model",
         "serial": "serial"                    
-    },
-
-    "ATTRIBUTE_VERBOSE": {
-        "ip": "Management Address",
-        "name": "System Hostname",
-        "dns": "DNS",
-        "location": "Location"
-    },
+    },   
 
     "NETDISCO_ATTR_CONVERT": {},
 
     "NETBOX_ATTR_CONVERT": {
         "ip": lambda x: str(x).split('/')[0]
+    },
+
+    "VERBOSE_NAME": {
+        "ip": "Management Address",
+        "name": "System Hostname",
+        "dns": "DNS",
+        "location": "Location"
     },
 
     "IGNORE": {}
@@ -46,7 +46,17 @@ PORT = {
         "up_admin": "enabled"            
     },
 
-    "ATTRIBUTE_VERBOSE": {
+    "NETDISCO_ATTR_CONVERT": {
+        "up": lambda x: x == "Up",
+        "up_admin": lambda x: x == "Up"
+    },
+
+    "NETBOX_ATTR_CONVERT": {
+        "ip": lambda x: str(x).split('/')[0],
+        "remote_ip": lambda x: str(x).split('/')[0],
+    },
+
+    "VERBOSE_NAME": {
         "ip": "Device",
         "remote_ip": "Neighbor Device",
         "desc": "Description",
@@ -54,15 +64,6 @@ PORT = {
         "mtu": "MTU",
         "pvid": "Native VLAN",
         "up_admin": "Enabled"
-    },
-
-    "NETDISCO_ATTR_CONVERT": {
-        "up": lambda x: x == "Up",
-        "up_admin": lambda x: x == "Up"
-    },
-
-    "NETBOX_ATTR_CONVERT": {
-        "ip": lambda x: str(x).split('/')[0]
     },
 
     "IGNORE": {}
@@ -81,12 +82,6 @@ ADDRESS = {
         "dns": "dns_name"            
     },
 
-    "ATTRIBUTE_VERBOSE": {
-        "ip": "Device",
-        "alias": "IP Address",
-        "subnet_": "Mask"
-    }, 
-
     "NETDISCO_ATTR_CONVERT": {
         "subnet_": lambda x: '/' + x.split('/')[1]
     },
@@ -94,6 +89,12 @@ ADDRESS = {
     "NETBOX_ATTR_CONVERT": {
         "ip": lambda x: str(x).split('/')[0],
         "subnet_": lambda x: '/' + str(x).split('/')[1]
+    },
+
+    "VERBOSE_NAME": {
+        "ip": "Device",
+        "alias": "IP Address",
+        "subnet_": "Mask"
     },
 
     "IGNORE": {}
@@ -110,16 +111,16 @@ VLAN = {
         "description": "name"
     },
 
-    "ATTRIBUTE_VERBOSE": {
-        "ip": "Device",
-        "vlan": "VLAN ID",
-        "description": "Name"
-    },
-
     "NETDISCO_ATTR_CONVERT": {},
 
     "NETBOX_ATTR_CONVERT": {
         "ip": lambda x: str(x).split('/')[0]
+    },
+
+    "VERBOSE_NAME": {
+        "ip": "Device",
+        "vlan": "VLAN ID",
+        "description": "Name"
     },
 
     "IGNORE": {}

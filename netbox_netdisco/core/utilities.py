@@ -16,13 +16,13 @@ def get_orm(orm_map, model_netdisco, queryset):
 
 
 class AttributeResolve():
-    def __init__(self, netdisco, netbox, attribute_map, attribute_verbose, netdisco_attr_convert, netbox_attr_convert):
+    def __init__(self, netdisco, netbox, attribute_map, netdisco_attr_convert, netbox_attr_convert, verbose_name):
         self.netdisco = netdisco
         self.netbox = netbox
         self.attribute_map = attribute_map
-        self.attribute_verbose = attribute_verbose
         self.netdisco_attr_convert = netdisco_attr_convert
         self.netbox_attr_convert = netbox_attr_convert
+        self.verbose_name = verbose_name
 
     def getattr_netdisco(self, key):
         unmangled = key.rstrip('_')
@@ -42,7 +42,7 @@ class AttributeResolve():
         
 
     def getattr_verbose(self, key):
-        verbose = self.attribute_verbose.get(key)
+        verbose = self.verbose_name.get(key)
         return verbose if verbose else key.capitalize()
 
     def attr_consistent(self, key):
