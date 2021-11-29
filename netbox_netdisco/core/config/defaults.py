@@ -3,28 +3,21 @@ DEVICE = {
         "ip": "primary_ip4__address__contains"
     },
 
-    "ATTRIBUTE_MAP": {        
-        "name": "name",
-        "location": "location",
-        "vendor": "device_type.manufacturer.name",
-        "model": "device_type.model",
-        "serial": "serial"                    
-    },   
+    #mangling supported  
 
-    "NETDISCO_ATTR_CONVERT": {},
-
-    "NETBOX_ATTR_CONVERT": {
-        "ip": lambda x: str(x).split('/')[0]
+    "NETBOX_ATTR": {
+        "vendor": lambda x: x.device_type.manufacturer.name,
+        "model": lambda x: x.device_type.model,
     },
 
-    "VERBOSE_NAME": {
+    "VERBOSE_ATTR": {
         "ip": "Management Address",
         "name": "System Hostname",
         "dns": "DNS",
         "location": "Location"
     },
 
-    "IGNORE": {}
+    "CONSISTENCY_TABLE": ["name", "location", "vendor", "model", "serial"],   
 }
 
 
@@ -32,33 +25,30 @@ PORT = {
     "ORM_MAP": {
         "ip": "device__primary_ip4__address__contains",
         "port": "name"
-    }, 
-
-    "ATTRIBUTE_MAP": {        
-        "remote_ip": "_path.destination.device.primary_ip4.address",
-        "remote_port": "_path.destination.name",
-        "desc": "description",
-        "type": "type",
-        "remote_type": "_path.destination.type",
-        "mac": "mac_address",
-        "mtu": "mtu",
-        "pvid": "untagged_vlan_id",
-        "up_admin": "enabled"            
     },
 
-    "NETDISCO_ATTR_CONVERT": {
+    #mangling supported
+
+    "NETDISCO_ATTR": {
         "up": lambda x: x == "Up",
         "up_admin": lambda x: x == "Up"
     },
 
-    "NETBOX_ATTR_CONVERT": {
-        "ip": lambda x: str(x).split('/')[0],
-        "remote_ip": lambda x: str(x).split('/')[0],
+    "NETBOX_ATTR": {
+        "remote_ip": lambda x: str(x._path.destination.device.primary_ip4.address).split('/')[0],
+        "remote_name": lambda x: x._path.destination.device.name,
+        "remote_port": lambda x: x._path.destination.name,
+        "remote_type": lambda x: x._path.destination.type,
+        "desc": lambda x: x.description,
+        "mac": lambda x: x.mac_address,
+        "pvid": lambda x: str(x.untagged_vlan_id),
+        "up_admin": lambda x: str(x.enabled)
     },
 
-    "VERBOSE_NAME": {
+    "VERBOSE_ATTR": {
         "ip": "Device",
         "remote_ip": "Neighbor Device",
+        "remote_name": "Neighbor Device Name",
         "desc": "Description",
         "mac": "Mac Address",
         "mtu": "MTU",
@@ -66,7 +56,9 @@ PORT = {
         "up_admin": "Enabled"
     },
 
-    "IGNORE": {}
+    "IGNORE_ATTR": ["remote_name"],
+
+    "CONSISTENCY_TABLE": ["remote_ip", "remote_name", "remote_port",  "remote_type", "desc", "type", "mac", "mtu",  "pvid", "up_admin"]
 }
 
 
@@ -75,29 +67,25 @@ ADDRESS = {
         "alias": "address__contains",
     },
 
-    "ATTRIBUTE_MAP": {
-        "ip": 'interface.get(name=self.netdisco.port).device.primary_ip4.address',
-        "subnet_": "address",
-        "port": "interface.get(name=self.netdisco.port).name",
-        "dns": "dns_name"            
+    #mangling supported
+
+    "NETDISCO_ATTR": {
+        "mask": lambda x: '/' + x.subnet.split('/')[1]
     },
 
-    "NETDISCO_ATTR_CONVERT": {
-        "subnet_": lambda x: '/' + x.split('/')[1]
+    "NETBOX_ATTR": {
+        "ip": lambda x: str(x.interface.first().device.primary_ip4.address).split('/')[0],
+        "mask": lambda x: '/' + str(x.address).split('/')[1],
+        "port": lambda x: x.interface.first().name,
+        "dns": lambda x: x.dns_name
     },
 
-    "NETBOX_ATTR_CONVERT": {
-        "ip": lambda x: str(x).split('/')[0],
-        "subnet_": lambda x: '/' + str(x).split('/')[1]
-    },
-
-    "VERBOSE_NAME": {
+    "VERBOSE_ATTR": {
         "ip": "Device",
         "alias": "IP Address",
-        "subnet_": "Mask"
     },
 
-    "IGNORE": {}
+    "CONSISTENCY_TABLE": ["ip", "mask", "port", "dns"]
 }
 
 
@@ -106,23 +94,18 @@ VLAN = {
         "vlan": "vid"
     },
 
-    "ATTRIBUTE_MAP": {  
-        #TODO: ip      
-        "description": "name"
+    #mangling supported
+
+    "NETBOX_ATTR": {
+        "description": lambda x: x.name
     },
 
-    "NETDISCO_ATTR_CONVERT": {},
-
-    "NETBOX_ATTR_CONVERT": {
-        "ip": lambda x: str(x).split('/')[0]
-    },
-
-    "VERBOSE_NAME": {
+    "VERBOSE_ATTR": {
         "ip": "Device",
         "vlan": "VLAN ID",
-        "description": "Name"
+        "description": "Description"
     },
 
-    "IGNORE": {}
+    "CONSISTENCY_TABLE": ["description"]
 }
 

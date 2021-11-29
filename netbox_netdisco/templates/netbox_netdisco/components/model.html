@@ -13,13 +13,12 @@
                     <div class="table-responsive">
                         <table class="table table-hover attr-table">                                          
                             <tbody>
-                                {% getdict_netdisco model as dict_netdisco %}
-                                {% for key in dict_netdisco %}
+                                {% for key in model.tables.INFORMATION %}
                                 {% getattr_netdisco model key as attr_netdisco %}                            
-                                {% getattr_verbose model key as name %}
+                                {% getattr_verbose model key as attr_verbose %}
                                 <tr>
                                     <th scope="row">                                                            
-                                        {{ name }}                                                                   
+                                        {{ attr_verbose }}                                                                   
                                     </th>
                                     <td>                                                                               
                                         {% if attr_netdisco != None %}
@@ -57,14 +56,14 @@
                                     <th>Netdisco</th>
                                     <th>Netbox</th>
                                 </tr>
-                                {% for key in model.attrs.attribute_map %}
+                                {% for key in model.tables.CONSISTENCY %}
                                 {% getattr_netdisco model key as attr_netdisco %}
                                 {% getattr_netbox model key as attr_netbox%}
-                                {% getattr_verbose model key as name %}
+                                {% getattr_verbose model key as attr_verbose %}
                                 {% attr_consistent model key as consistent %}
-                                <tr class="{% if not consistent %}border-danger{% else %}{% if attr_netdisco != None %}border-success{% endif %}{% endif %}">
-                                    <th scope="row">                                                           
-                                        {{ name }}                                                                       
+                                <tr class="{% if consistent == False %}border-danger{% elif consistent == True%}{% if attr_netdisco != None %}border-success{% endif %}{% endif %}">
+                                    <th scope="row">                                                         
+                                        {{ attr_verbose }}                                                                
                                     </th>
                                     <td>                                                                               
                                         {% if attr_netdisco != None %}
@@ -74,13 +73,13 @@
                                         {% endif %}
                                     </td>
                                                                       
-                                    <td class="text-danger">
-                                        {% if consistent == False %}
+                                    <td class="{% if consistent == False%}text-danger{% endif %}">
+                                        {% if consistent != True %}
                                         {{ attr_netbox }}
-                                        {% endif %} 
-                                    </td>                                    
+                                        {% endif %}
+                                    </td>                                   
                                 </tr>
-                                {% endfor %} 
+                                {% endfor %}
                             </tbody>                            
                         </table>
                         {% endif %}     

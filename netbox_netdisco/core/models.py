@@ -14,11 +14,15 @@ class CommonModel():
         self.attrs = AttributeResolve(
             self.netdisco,
             self.netbox,
-            attr_config.get("ATTRIBUTE_MAP", {}), 
-            attr_config.get("NETDISCO_ATTR_CONVERT", {}), 
-            attr_config.get("NETBOX_ATTR_CONVERT", {}),
-            attr_config.get("VERBOSE_NAME", {})
+            attr_config.get("NETDISCO_ATTR", {}),
+            attr_config.get("NETBOX_ATTR", {}),
+            attr_config.get("VERBOSE_ATTR", {}),
+            attr_config.get("IGNORE_ATTR", [])
         )
+        self.tables = {
+            "INFORMATION": attr_config.get("INFORMATION_TABLE", self.netdisco.to_dict().keys()),
+            "CONSISTENCY": attr_config.get("CONSISTENCY_TABLE", []),
+        }
 
     @property
     def in_netbox(self):
@@ -28,7 +32,7 @@ class CommonModel():
     def is_consistent(self):
         if not self.in_netbox:
             return False
-        for key in self.attrs.attribute_map:            
+        for key in self.tables["CONSISTENCY"]:            
             if self.attrs.attr_consistent(key) == False:
                 return False
         return True

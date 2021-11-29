@@ -5,10 +5,6 @@ register = template.Library()
 
 
 @register.simple_tag
-def getdict_netdisco(model):
-    return model.netdisco.to_dict()
-
-@register.simple_tag
 def getattr_netdisco(model, key):
     return model.attrs.getattr_netdisco(key)
 
@@ -19,6 +15,10 @@ def getattr_netbox(model, key):
 @register.simple_tag
 def attr_consistent(model, key):
     return model.attrs.attr_consistent(key)
+
+@register.simple_tag
+def attr_ignore(model, key):
+    return key in model.tables["INGORE"]
 
 @register.simple_tag
 def getattr_verbose(model, key):

@@ -1,4 +1,7 @@
 
+from netbox_netdisco.templatetags.custom_tags import attr_consistent
+
+
 def sum_inconsistent(models):
     return sum(1 for model in models if not model.is_consistent)    
 
@@ -16,34 +19,37 @@ def get_orm(orm_map, model_netdisco, queryset):
 
 
 class AttributeResolve():
-    def __init__(self, netdisco, netbox, attribute_map, netdisco_attr_convert, netbox_attr_convert, verbose_name):
+    def __init__(self, netdisco, netbox, netdisco_attr, netbox_attr, verbose_attr, ignore_attr):
         self.netdisco = netdisco
         self.netbox = netbox
-        self.attribute_map = attribute_map
-        self.netdisco_attr_convert = netdisco_attr_convert
-        self.netbox_attr_convert = netbox_attr_convert
-        self.verbose_name = verbose_name
+        self.netdisco_attr = netdisco_attr
+        self.netbox_attr = netbox_attr
+        self.verbose_attr = verbose_attr
+        self.ignore_attr = ignore_attr
 
     def getattr_netdisco(self, key):
         unmangled = key.rstrip('_')
-        return self._getattr_generic("self.netdisco.", unmangled, self.netdisco_attr_convert.get(key, lambda x: x))
+        lambda_ = self.netdisco_attr.get(unmangled, lambda x: getattr(x, unmangled))
+        try:
+            return lambda_(self.netdisco)
+        except AttributeError:
+            return None
+        #return self._getattr_generic("self.netdisco.", unmangled, self.netdisco_attr_convert.get(key, lambda x: x))
 
     def getattr_netbox(self, key):
-        return self._getattr_generic("self.netbox.", self.attribute_map.get(key), self.netbox_attr_convert.get(key, lambda x: str(x)))
-
-    def _getattr_generic(self, base, expression, convert):
+        unmangled = key.rstrip('_')
+        lambda_ = self.netbox_attr.get(unmangled, lambda x: str(getattr(x, unmangled)))
         try:
-            if expression:
-                value = eval(base + expression)
-            if value:
-                return convert(value)
-        except BaseException:
-            return None 
+            return lambda_(self.netbox)
+        except AttributeError:
+            return None
+        #return self._getattr_generic("self.netbox.", self.attribute_map.get(key), self.netbox_attr_convert.get(key, lambda x: str(x)))
         
-
     def getattr_verbose(self, key):
-        verbose = self.verbose_name.get(key)
+        verbose = self.verbose_attr.get(key)
         return verbose if verbose else key.capitalize()
 
-    def attr_consistent(self, key):
-        return self.getattr_netdisco(key) == self.getattr_netbox(key)
+    def attr_consistent(self, key):    
+        if self.getattr_netdisco(key) == self.getattr_netbox(key):
+            return True
+        return None if key in self.ignore_attr else False
