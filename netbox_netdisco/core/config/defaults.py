@@ -47,7 +47,7 @@ PORT = {
 
     "VERBOSE_ATTR": {
         "ip": "Device",
-        "remote_ip": "Neighbor Device",
+        "remote_ip": "Neighbor Device IP",
         "remote_name": "Neighbor Device Name",
         "desc": "Description",
         "mac": "Mac Address",
