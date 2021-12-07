@@ -1,5 +1,5 @@
 from .netdisco import Netdisco
-from .monitoring import Icinga
+from .notification import Icinga
 from .models import *
 from .utilities import sum_inconsistent
 from netbox import settings
