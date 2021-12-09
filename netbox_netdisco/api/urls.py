@@ -7,7 +7,6 @@ urlpatterns = [
 
     path('device/collect/', views.device_collect, name='device_collect')
 
-
     # path('collect/device/', views.collect_devices, name='collect_devices'),
     # path('collect/device/<ip>/', views.collect_device, name='collect_device'),
 
