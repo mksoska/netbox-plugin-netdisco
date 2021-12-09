@@ -19,8 +19,9 @@ class CommonModel():
             attr_config.get("VERBOSE_ATTR", {}),
             attr_config.get("IGNORE_ATTR", [])
         )
+
         self.tables = {
-            "INFORMATION": attr_config.get("INFORMATION_TABLE", self.netdisco.to_dict().keys()),
+            "INFORMATION": attr_config.get("SUMMARY_TABLE", self.netdisco.to_dict().keys()),
             "CONSISTENCY": attr_config.get("CONSISTENCY_TABLE", []),
         }
 
