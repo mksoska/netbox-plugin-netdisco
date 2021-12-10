@@ -32,17 +32,20 @@ def inventory_collect(request):
 @api_view(['POST'])
 @permission_classes((permissions.AllowAny,))
 def inventory_notify(request):
-    response = Inventory.notify()
+    error_response = Inventory.notify()
+
+    if not error_response:
+        content = json.dumps({"notify": "Notification successfuly sent."})
+        status = 200
+    else:
+        # TODO: Add better error message based on response content
+        content = json.dumps({"notify": "Notification failed."})
+        status = 500
     
     return HttpResponse(
-        content=json.dumps({"notify": "Notification successfuly sent."}),
-        status=200,
-        content_type=response.headers['Content-Type']
-    ) if response.status_code == 200 else HttpResponse(
-        # TODO: Add better error message based on response content
-        content=json.dumps({"notify": "Notification failed."}),
-        status=500,
-        content_type=response.headers['Content-Type']
+        content=content,
+        status=status,
+        content_type='Accept: application/json'
     )
 
 

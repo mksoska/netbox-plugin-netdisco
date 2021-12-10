@@ -15,7 +15,7 @@ class Icinga():
 
         data = {
             "type": "Service",
-            "author": "NetBox plugin Netdisco",
+            "author": "Netbox Plugin Netdisco",
             "comment": comment,
             "force": True,
             "pretty": True
@@ -27,7 +27,8 @@ class Icinga():
             request_url,
             headers=headers,
             auth=(self.username, self.password),
-            data=json.dumps(data)
+            data=json.dumps(data),
+            verify=False
         )        
 
         
