@@ -10,7 +10,7 @@ urlpatterns = [
     path('port/', views.NetdiscoPortListView.as_view(), name="port_list"),
     #path('port/search/<search>', views.NetdiscoPortSearchView.as_view(), name="port_search"),
     path('device/<ip>/port/', views.NetdiscoDevicePortListView.as_view(), name="device_port_list"),
-    path('port/<port>/device/<ip>/', views.NetdiscoPortView.as_view(), name="port"),
+    path('port/<path:port>/device/<ip>/', views.NetdiscoPortView.as_view(), name="port"),
 
     path('address/', views.NetdiscoAddressListView.as_view(), name="address_list"),
     #path('address/search/<search>', views.NetdiscoAddressSearchView.as_view(), name="address_search"),
