@@ -8,7 +8,7 @@
         <a class="text-decoration-none" href="{% url 'plugins:netbox_netdisco:device' ip=device.netdisco.ip %}">{{ device.netdisco.name }}</a>
     </h6>
 </div>
-{{ device.netdisco.dns }}
+{{ device.netdisco.name }}
 {% endblock %}
 
 {% block subtitle %}
