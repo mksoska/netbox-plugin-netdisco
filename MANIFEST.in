@@ -1,1 +1,1 @@
-recursive-include netbox_bgp/templates *.html
+recursive-include netbox_netdisco/templates *.html
