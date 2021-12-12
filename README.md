@@ -41,14 +41,31 @@ Then, configure the plugin as an installed plugin in Netbox configuration.py:
 ```
 vim /opt/netbox/netbox/netbox/configuration.py
 ```
-TODO: add the configuration
-
 
 Setup Netdisco host in the configuration.py file:
+```
+PLUGINS_CONFIG = {
+    'netbox_netdisco': {
+        'NETDISCO_HOST': 'http://localhost:5000',
+        'NETDISCO_USERNAME': 'user',
+        'NETDISCO_PASSWORD': 'password'
+    }
+}
+```
 
-
-Setup Icinga host:
-
+Optionally, you can setup a Icinga2 host with API credentials, to push notifications:
+```
+PLUGINS_CONFIG = {
+    'netbox_netdisco': {
+        'NETDISCO_HOST': 'http://localhost:5000',
+        'NETDISCO_USERNAME': 'user',
+        'NETDISCO_PASSWORD': 'password',
+        'ICINGA2_HOST': 'https://localhost:5665',
+        'ICINGA2_USERNAME': 'user',
+        'ICINGA2_PASSWORD': 'password'
+    }
+}
+```
 
 
 
